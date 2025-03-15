@@ -36,7 +36,7 @@ Game::~Game()
 }
 
 void Game::networking(Comms* comms) {
-    if (comms->stack_send(SYN{ (int)SDL_GetTicks() })) {
+    if (comms->stack_send(SYN{ SDL_GetTicks() })) {
         std::cout << "SYN SENT\n";
     }
 
@@ -97,8 +97,6 @@ void Game::init(const char* title, int width, int height, bool fullscreen)
         flags = SDL_WINDOW_FULLSCREEN;
     }
 
-    
-   
         
     
     isRunning = true;

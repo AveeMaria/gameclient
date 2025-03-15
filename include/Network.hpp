@@ -1,24 +1,24 @@
 #pragma once
 
-
+#include <SDL.h>
 
 struct Ping {
-	int time;
+	Uint32 time;
 };
 
 struct Pong {
-	int time;
+	Uint32 time;
 };
 
 
 struct SYN {
-	int time;
+	Uint32 time;
 };
 
 struct SYN_ACK {
-	int time;
+	Uint32 time;
 };
 
 struct ACK {
-	int time;
+	Uint32 time;
 };

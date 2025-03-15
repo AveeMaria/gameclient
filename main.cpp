@@ -104,9 +104,12 @@ int main(int argc, char* argv[])
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(5));
 	
-	if (comms.stack_send(SYN{ 0 })) {
-		std::cout << "SYN SENT\n";
+	for(int i = 0; i<100; i++) {
+		if (comms.stack_send(SYN{ SDL_GetTicks() })) {
+			std::cout << "SYN SENT\n";
+		}
 	}
+	
 	
 	while (game.running())
 	{
