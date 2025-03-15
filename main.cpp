@@ -17,18 +17,44 @@ Game game;
 
 int main(int argc, char* argv[])
 {
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_TIMER) < 0)
-	{
-		std::cerr << "ERROR: SDL could not initialize! SDL_Error: " << SDL_GetError() << "\n";
-	}
-	if (TTF_Init() == -1) {
-		std::cout << "ERROR: SDL_ttf could not initialize! TTF_Error: " << TTF_GetError() << "\n";
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER) != 0) {
+		std::cerr << "SDL_Init failed: " << SDL_GetError() << std::endl;
+		return -1;
 	}
 
-	if (SDLNet_Init() < 0) {
-		std::cerr << "ERROR: SDLNet_Init failed: " << SDLNet_GetError() << "\n";
-		SDLNet_Quit();
+	{
+	int imgFlags = IMG_INIT_PNG | IMG_INIT_JPG | IMG_INIT_TIF;
+	if ((IMG_Init(imgFlags) & imgFlags) != imgFlags) {
+		std::cerr << "IMG_Init failed: " << IMG_GetError() << std::endl;
+		SDL_Quit();
+		return -1;
 	}
+	}
+
+	if (Mix_Init(MIX_INIT_MP3 | MIX_INIT_OGG) == 0) {
+		std::cerr << "Mix_Init failed: " << Mix_GetError() << std::endl;
+		IMG_Quit();
+		SDL_Quit();
+		return -1;
+	}
+
+	if (TTF_Init() == -1) {
+		std::cerr << "TTF_Init failed: " << TTF_GetError() << std::endl;
+		Mix_Quit();
+		IMG_Quit();
+		SDL_Quit();
+		return -1;
+	}
+
+	if (SDLNet_Init() != 0) {
+		std::cerr << "SDLNet_Init failed: " << SDLNet_GetError() << std::endl;
+		TTF_Quit();
+		Mix_Quit();
+		IMG_Quit();
+		SDL_Quit();
+		return -1;
+	}
+
 
 
 	Renderer::window = SDL_CreateWindow("Vojna kraljestev", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);

@@ -19,11 +19,18 @@ short lvl1[5][9] = {
 };
 
 Map::Map() {
+    /*
     water = TextureManager::LoadTexture("../../../assets/water.png");
     sand = TextureManager::LoadTexture("../../../assets/sand.png");
     grass = TextureManager::LoadTexture("../../../assets/grass.png");
     forest = TextureManager::LoadTexture("../../../assets/forest.png");
     corrupted = TextureManager::LoadTexture("../../../assets/corrupted.png");
+*/
+    water = std::make_unique<SDL_Texture*>(TextureManager::LoadTexture("../../../assets/water.png"));
+    sand = std::make_unique<SDL_Texture*>(TextureManager::LoadTexture("../../../assets/sand.png"));
+    grass = std::make_unique<SDL_Texture*>(TextureManager::LoadTexture("../../../assets/grass.png"));
+    forest = std::make_unique<SDL_Texture*>(TextureManager::LoadTexture("../../../assets/forest.png"));
+    corrupted = std::make_unique<SDL_Texture*>(TextureManager::LoadTexture("../../../assets/corrupted.png"));
 
     LoadMap(lvl1);
     
@@ -35,11 +42,13 @@ Map::Map() {
 }
 
 Map::~Map() {
-    SDL_DestroyTexture(water);
-    SDL_DestroyTexture(sand);
-    SDL_DestroyTexture(grass);
-    SDL_DestroyTexture(forest);
-    SDL_DestroyTexture(corrupted);
+    
+    SDL_DestroyTexture(*water);
+    SDL_DestroyTexture(*sand);
+    SDL_DestroyTexture(*grass);
+    SDL_DestroyTexture(*forest);
+    SDL_DestroyTexture(*corrupted);
+    
 }
 
 short Map::getMapValue(short r, short c)
@@ -71,19 +80,19 @@ void Map::DrawMap() {
             switch (type)
             {
             case 0:
-                TextureManager::Draw(grass, src, dest);
+                TextureManager::Draw(*grass, src, dest);
                 break;
             case 1:
-                TextureManager::Draw(sand, src, dest);
+                TextureManager::Draw(*sand, src, dest);
                 break;
             case 2:
-                TextureManager::Draw(water, src, dest);
+                TextureManager::Draw(*water, src, dest);
                 break;
             case 3:
-                TextureManager::Draw(forest, src, dest);
+                TextureManager::Draw(*forest, src, dest);
                 break;
             default:
-                TextureManager::Draw(corrupted, src, dest);
+                TextureManager::Draw(*corrupted, src, dest);
                 break;
             }
         }

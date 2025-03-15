@@ -52,6 +52,7 @@ public:
 
 	~Enemy() {}
 };
+
 /*
 //TODO FIX
 SDL_Texture enemyTextures[5] {

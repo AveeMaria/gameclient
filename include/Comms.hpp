@@ -131,10 +131,11 @@ bool Comms::stack_send(T data) {
     std::cout << "size of T: " << sizeof(T) << "\n";
     std::cout << "Packet len: " << sendPacket->len << "\n";
 
+    //if (sendPacket->len == 0) {
+        sendPacket->len = (static_cast<int>(sizeof(T) + 1));
+    //}
 
-    if (sendPacket->len == 0) {
-        sendPacket->len = (static_cast<int>(sizeof(T)) + 1);
-    }
+    
 
     sendPacket->address.host = ip.host;
     sendPacket->address.port = ip.port;
@@ -182,9 +183,7 @@ bool Comms::stack_send(T data, IPaddress _ip) {
         std::cout << "ERROR: No packet\n";
     }
 
-    if (sendPacket->len == 0) {
-        sendPacket->len = (sizeof(T) + 1);
-    }
+    sendPacket->len = (sizeof(T) + 1);
 
     sendPacket->data[0] = type;
     std::memcpy(&sendPacket->data[1], &data, sizeof(T));

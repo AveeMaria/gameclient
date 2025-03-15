@@ -21,17 +21,19 @@ Projectile::Projectile()
 
 Projectile::Projectile(Coords start, ProjType p) {
     type = p;
-    objTexture = TextureManager::LoadTexture(typeTexture(type));
+    objTexture = std::make_unique<SDL_Texture*>(TextureManager::LoadTexture(typeTexture(type)));
+    //objTexture = TextureManager::LoadTexture(typeTexture(type));
     Utils::convertCoords(xpos, ypos, start);
 }
 
 Projectile::Projectile(bool b) {
 	type = ProjType::ARROW;
-	objTexture = TextureManager::LoadTexture(typeTexture(type));
+    objTexture = std::make_unique<SDL_Texture*>(TextureManager::LoadTexture(typeTexture(type)));
+	//objTexture = TextureManager::LoadTexture(typeTexture(type));
 }
 Projectile::~Projectile()
 {
-    SDL_DestroyTexture(objTexture);
+    SDL_DestroyTexture(*objTexture);
 }
 
 bool Projectile::moveToTarget(const Coords& t) {
@@ -66,5 +68,5 @@ void Projectile::Update()
 
 void Projectile::Render()
 {
-	SDL_RenderCopy(Renderer::renderer, objTexture, &srcRect, &destRect);
+	SDL_RenderCopy(Renderer::renderer, *objTexture, &srcRect, &destRect);
 }

@@ -29,11 +29,19 @@ public:
 private:
     SDL_Rect src, dest;
 
+    std::unique_ptr<SDL_Texture*> water;
+    std::unique_ptr<SDL_Texture*> sand;
+    std::unique_ptr<SDL_Texture*> grass;
+    std::unique_ptr<SDL_Texture*> forest;
+    std::unique_ptr<SDL_Texture*> corrupted;
+
+
+    /*
     SDL_Texture* water;
     SDL_Texture* sand;
     SDL_Texture* grass;
     SDL_Texture* forest;
     SDL_Texture* corrupted;
-
+*/
     short map[MAP_ROWS][MAP_COLS];
 };

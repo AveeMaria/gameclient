@@ -4,13 +4,18 @@ Modal::Modal()
 {
 	srcRect = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
 	destRect = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
-	objTexture = TextureManager::LoadTexture("../../../assets/modal.png");
+	
+	objTexture = std::make_unique<SDL_Texture*>(TextureManager::LoadTexture("../../../assets/modal.png"));
+	//objTexture = TextureManager::LoadTexture("../../../assets/modal.png");
+	
 	std::cout << "WARNING: nezeljen modal konstruktor\n";
 }
 
 Modal::Modal(const char* title, short width, short height)
 {
-	objTexture = TextureManager::LoadTexture("../../../assets/modal.png");
+	objTexture = std::make_unique<SDL_Texture*>(TextureManager::LoadTexture("../../../assets/modal.png"));
+
+	//objTexture = TextureManager::LoadTexture("../../../assets/modal.png");
 
 	if (width >= SCREEN_WIDTH || width <= 0) {
 		std::cerr << "ERROR: Invalid modal width!!\n";
@@ -32,7 +37,10 @@ Modal::Modal(const char* title, short width, short height)
 
 Modal::Modal(std::string title, short width, short height)
 {
-	objTexture = TextureManager::LoadTexture("../../../assets/modal.png");
+
+	objTexture = std::make_unique<SDL_Texture*>(TextureManager::LoadTexture("../../../assets/modal.png"));
+
+	//objTexture = TextureManager::LoadTexture("../../../assets/modal.png");
 
 	if (width >= SCREEN_WIDTH || width <= 0) {
 		std::cerr << "ERROR: Invalid modal width!!\n";
@@ -53,7 +61,7 @@ Modal::Modal(std::string title, short width, short height)
 
 Modal::~Modal()
 {
-	SDL_DestroyTexture(objTexture);
+	SDL_DestroyTexture(*objTexture);
 }
 
 void Modal::setTitle(const char* t)
@@ -103,5 +111,5 @@ void Modal::centerModal() {
 
 void Modal::Render()
 {
-	SDL_RenderCopy(Renderer::renderer, objTexture, &srcRect, &destRect);
+	SDL_RenderCopy(Renderer::renderer, *objTexture, &srcRect, &destRect);
 }
