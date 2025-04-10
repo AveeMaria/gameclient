@@ -96,7 +96,6 @@ bool Comms::recieve()
 bool Comms::recieve(UDPpacket** recvPacket)
 {
     if (SDLNet_UDP_Recv(sock, *recvPacket) <= 0) {
-        SDLNet_FreePacket(*recvPacket);
         return false;
     }
 
@@ -116,7 +115,6 @@ bool Comms::recieve(UDPpacket** recvPacket)
 bool Comms::recieve(UDPpacket* recvPacket)
 {
     if (SDLNet_UDP_Recv(sock, recvPacket) <= 0) {
-        SDLNet_FreePacket(recvPacket);
         return false;
     }
 

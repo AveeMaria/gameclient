@@ -87,6 +87,12 @@ int main(int argc, char* argv[])
 	int frameCount = 0;
 	Uint32 fpsTimer = SDL_GetTicks();
 
+	UDPpacket* recvPacket = SDLNet_AllocPacket(256);
+	if (!recvPacket) {
+		std::cerr << "Error allocating packet: " << SDLNet_GetError() << std::endl;
+		return -1;
+	}
+
 	game.init("Vojna kraljestev", SCREEN_WIDTH, SCREEN_HEIGHT, false);
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(5));
@@ -101,7 +107,7 @@ int main(int argc, char* argv[])
 
 		game.handleEvents();
 
-		game.networking(&comms);
+		game.networking(&comms, recvPacket);
 
 		game.update();
 		game.render();
