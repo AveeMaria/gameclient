@@ -121,6 +121,27 @@ Tower::Tower(TowerType t, short r, short c)
 	Update();
 }
 
+Tower::Tower(TowerType t, SDL_Rect r)
+{
+	srcRect = { 0, 0, TEXTURE_SIZE, TEXTURE_SIZE };
+
+	xpos = r.y;
+	ypos = r.y;
+
+	type = t;
+
+	shootdelay = typeShootDelay(type);
+
+	if (type == TowerType::BARRACKS) {
+		allies.emplace_back(std::make_unique<Ally>(xpos + TILESIZE / 2, ypos + TILESIZE));
+		allies.emplace_back(std::make_unique<Ally>(xpos + TILESIZE / 2, ypos + TILESIZE * 3 / 2));
+		allies.emplace_back(std::make_unique<Ally>(xpos, ypos + TILESIZE));
+		allies.emplace_back(std::make_unique<Ally>(xpos, ypos + TILESIZE * 3 / 2));
+	}
+
+	Update();
+}
+
 Tower::~Tower()
 {
 	SDL_DestroyTexture(*objTexture);

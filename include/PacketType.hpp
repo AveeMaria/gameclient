@@ -7,50 +7,100 @@
 enum class PacketType : Uint8 {
     //networking
     PING = 0,
-	PONG = 5,
+    PONG = 5,
 
     SYN = 10,
     SYN_ACK = 15,
     ACK = 20,
 
-    //game data
-    PLAYER_NAME = 30,//string
-    ENTITY_POS = 40,
+    //game data transmission
+    GAME_DATA_START = 25,
+    GAME_DATA_END = 30,
 
+    //gamedata
+
+    CREATE_TOWER = 35,//destrect, type (17byte)
+
+    PLAYER_NAME = 100,//string
+    ENTITY_POS = 140,
     //input data
 
     UNDEFINED = 255//smeti?
 };
 
+
 template<typename T>
 Uint8 checkType(const T& data)
 {
-    if (std::is_same<T, Ping>::value) {
-        std::cout << "The type is ping.\n";
-        return static_cast<Uint8>(PacketType::PING);
-    }
-    else if (std::is_same<T, SYN>::value) {
-        std::cout << "The type is syn.\n";
-        return static_cast<Uint8>(PacketType::SYN);
-    }
-    else if (std::is_same<T, SYN_ACK>::value) {
-        std::cout << "The type is syn_ack.\n";
-        return static_cast<Uint8>(PacketType::SYN_ACK);
-    }
-    else if (std::is_same<T, ACK>::value) {
-        std::cout << "The type is ack.\n";
-        return static_cast<Uint8>(PacketType::ACK);
-    }
-    else if (std::is_same<T, std::string>::value) {
-        std::cout << "The type is std::string.\n";
-        return static_cast<Uint8>(PacketType::PLAYER_NAME);
-    }
-    else if (std::is_same<T, EntityPos>::value) {
-        std::cout << "The type is std::string.\n";
-        return static_cast<Uint8>(PacketType::ENTITY_POS);
+    if (true) {
+        if (std::is_same<T, PING>::value) {
+            return static_cast<Uint8>(PacketType::PING);
+        }
+
+        else if (std::is_same<T, PONG>::value) {
+            return static_cast<Uint8>(PacketType::PONG);
+        }
+
+        else if (std::is_same<T, SYN>::value) {
+            return static_cast<Uint8>(PacketType::SYN);
+        }
+        else if (std::is_same<T, SYN_ACK>::value) {
+            return static_cast<Uint8>(PacketType::SYN_ACK);
+        }
+        else if (std::is_same<T, ACK>::value) {
+            return static_cast<Uint8>(PacketType::ACK);
+        }
+        ////////
+        else if (std::is_same<T, CreateTower>::value) {
+            return static_cast<Uint8>(PacketType::CREATE_TOWER);
+        }
+
+        else if (std::is_same<T, std::string>::value) {
+            return static_cast<Uint8>(PacketType::PLAYER_NAME);
+        }
+        else if (std::is_same<T, EntityPos>::value) {
+            return static_cast<Uint8>(PacketType::ENTITY_POS);
+        }
+        else {
+            return static_cast<Uint8>(PacketType::UNDEFINED);
+        }
     }
     else {
-        std::cout << "The type is undefined.\n";
-        return static_cast<Uint8>(PacketType::UNDEFINED);
+        ////////////SAM ZA DEBUG K MA SE SPOROCILA!
+        if (std::is_same<T, PING>::value) {
+            std::cout << "The type is PING.\n";
+            return static_cast<Uint8>(PacketType::PING);
+        }
+
+        else if (std::is_same<T, PONG>::value) {
+            std::cout << "The type is PONG.\n";
+            return static_cast<Uint8>(PacketType::PONG);
+        }
+
+        else if (std::is_same<T, SYN>::value) {
+            std::cout << "The type is syn.\n";
+            return static_cast<Uint8>(PacketType::SYN);
+        }
+        else if (std::is_same<T, SYN_ACK>::value) {
+            std::cout << "The type is syn_ack.\n";
+            return static_cast<Uint8>(PacketType::SYN_ACK);
+        }
+        else if (std::is_same<T, ACK>::value) {
+            std::cout << "The type is ack.\n";
+            return static_cast<Uint8>(PacketType::ACK);
+        }
+        ////////
+        else if (std::is_same<T, std::string>::value) {
+            std::cout << "The type is std::string.\n";
+            return static_cast<Uint8>(PacketType::PLAYER_NAME);
+        }
+        else if (std::is_same<T, EntityPos>::value) {
+            std::cout << "The type is std::string.\n";
+            return static_cast<Uint8>(PacketType::ENTITY_POS);
+        }
+        else {
+            std::cout << "The type is undefined.\n";
+            return static_cast<Uint8>(PacketType::UNDEFINED);
+        }
     }
 }

@@ -74,8 +74,14 @@ void Game::networking(Comms* comms) {
         case (int)PacketType::ACK:
             std::cout << "ERROR: type: ACK\n";//TEGA CLIENT NE SPREJEMA KER POSLJE
             break;
-            ///////
-        
+        case (int)PacketType::CREATE_TOWER:
+            std::cout << "type: CREATE_TOWER\n";
+            
+			CreateTower ct;
+			std::memcpy(&ct, &recvPacket->data[1], sizeof(CreateTower));
+            towers.emplace_back(std::make_unique<Tower>(ct.type, ct.destRect));
+
+            break;
         default:
             std::cout << "Unknown packet type.\n";
             break;
@@ -109,21 +115,10 @@ void Game::init(const char* title, int width, int height, bool fullscreen)
     textRenderer->loadFont("../../../assets/fonts/MedievalSharp.ttf", 20);
 
     map = std::make_unique<Map>();
+    timer = std::make_unique<Timer>((uint32_t)90);
     cursor = std::make_unique<Cursor>("../../../assets/cursor.png");
 
-    towers.emplace_back(std::make_unique<Tower>(TowerType::ARCHER, 1, 2));
-    towers.emplace_back(std::make_unique<Tower>(TowerType::MAGE, 5, 1));
-    towers.emplace_back(std::make_unique<Tower>(TowerType::BARRACKS, 3, 1));
-    towers.emplace_back(std::make_unique<Tower>(TowerType::MORTAR, 3, 3));
-
-    Coords c = Utils::getTileMiddle(Tile{ 1, 0 });
-    c.y -= TILESIZE / 4;
-
-    enemies.emplace_back(std::make_unique<Enemy>(c));
-
     //std::cout << "towers: " << towers.size() << "\n"; std::cout << "enemies: " << enemies.size() << "\n";
-
-    timer = std::make_unique<Timer>((uint32_t)90);
 
     /*
     ///NETWORKING
@@ -344,7 +339,6 @@ void Game::render() {
 
     //BREZ TEGA SDL_Net ne dela pravilno
     //SDL_DestroyRenderer(Renderer::renderer);
-
 }
 
 void Game::clean() {

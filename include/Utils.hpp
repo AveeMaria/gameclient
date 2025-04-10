@@ -32,6 +32,10 @@ struct EntityPos {
 	Coords coords;
 };
 
+struct CreateTower {
+	SDL_Rect destRect;
+	Uint32 type;
+};
 
 enum class ProjType {
 	ARROW,

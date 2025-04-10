@@ -2,11 +2,11 @@
 
 #include <SDL.h>
 
-struct Ping {
+struct PING {
 	Uint32 time;
 };
 
-struct Pong {
+struct PONG {
 	Uint32 time;
 };
 
