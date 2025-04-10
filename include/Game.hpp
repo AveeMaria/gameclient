@@ -34,7 +34,11 @@ public:
 	Game();
 	~Game();
 
-	void networking(Comms* comms);
+	void handlePacket(Comms* comms, UDPpacket* recvPacket);
+
+	void networking(Comms* comms, UDPpacket* recvPacket);
+
+	//void networking(Comms* comms);
 	//void networking(Comms& comms);
 	//void networking();
 	//void networking(Comms* comms, UDPpacket* recvPacket);

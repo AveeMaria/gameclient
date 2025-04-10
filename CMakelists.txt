@@ -3,7 +3,7 @@ set(SDL2_DIR "${CMAKE_SOURCE_DIR}/lib/SDL2")
 set(SDL2_IMAGE_DIR "${CMAKE_SOURCE_DIR}/lib/SDL2_image")
 set(SDL2_NET_DIR "${CMAKE_SOURCE_DIR}/lib/SDL2_net")
 set(SDL2_TTF_DIR "${CMAKE_SOURCE_DIR}/lib/SDL2_ttf")
-set(SDL2_MIXER_DIR "${CMAKE_SOURCE_DIR}/lib/SDL2_mixer")  # Corrected SDL2_mixer
+set(SDL2_MIXER_DIR "${CMAKE_SOURCE_DIR}/lib/SDL2_mixer")
 
 #include SDL2, SDL2_image, SDL2_net, SDL2_ttf, and SDL2_mixer headers
 include_directories(
@@ -11,7 +11,7 @@ include_directories(
     "${SDL2_IMAGE_DIR}/include"
     "${SDL2_NET_DIR}/include"
     "${SDL2_TTF_DIR}/include"
-    "${SDL2_MIXER_DIR}/include"  # Corrected SDL2_mixer
+    "${SDL2_MIXER_DIR}/include"
 )
 
 #add src files
@@ -29,7 +29,7 @@ target_link_libraries(Game
     "${SDL2_IMAGE_DIR}/lib/x64/SDL2_image.lib"
     "${SDL2_NET_DIR}/lib/x64/SDL2_net.lib"
     "${SDL2_TTF_DIR}/lib/x64/SDL2_ttf.lib"
-    "${SDL2_MIXER_DIR}/lib/x64/SDL2_mixer.lib"  # Corrected SDL2_mixer
+    "${SDL2_MIXER_DIR}/lib/x64/SDL2_mixer.lib"
 )
 
 add_custom_command(TARGET Game POST_BUILD
@@ -38,7 +38,7 @@ add_custom_command(TARGET Game POST_BUILD
     "${SDL2_IMAGE_DIR}/lib/x64/SDL2_image.dll"
     "${SDL2_NET_DIR}/lib/x64/SDL2_net.dll"
     "${SDL2_TTF_DIR}/lib/x64/SDL2_ttf.dll"
-    "${SDL2_MIXER_DIR}/lib/x64/SDL2_mixer.dll"  # Corrected SDL2_mixer
+    "${SDL2_MIXER_DIR}/lib/x64/SDL2_mixer.dll"
     "${SDL2_IMAGE_DIR}/lib/x64/libjpeg-9.dll"
     "${SDL2_IMAGE_DIR}/lib/x64/libpng16-16.dll"
     "${SDL2_IMAGE_DIR}/lib/x64/libtiff-5.dll"
@@ -51,8 +51,8 @@ message(STATUS "presnet cmake DIR: ${CMAKE_SOURCE_DIR}")
 message(STATUS "SDL2_DIR: ${SDL2_DIR}")
 message(STATUS "SDL2_IMAGE_DIR: ${SDL2_IMAGE_DIR}")
 message(STATUS "SDL2_NET_DIR: ${SDL2_NET_DIR}")
-message(STATUS "SDL2_TTF_DIR: ${SDL2_TTF_DIR}")  # Debugging line
-message(STATUS "SDL2_MIXER_DIR: ${SDL2_MIXER_DIR}")  # Debugging line
+message(STATUS "SDL2_TTF_DIR: ${SDL2_TTF_DIR}")
+message(STATUS "SDL2_MIXER_DIR: ${SDL2_MIXER_DIR}")
 
 #check if DLL files exist and report errors
 if(NOT EXISTS "${SDL2_DIR}/lib/x64/SDL2.dll")

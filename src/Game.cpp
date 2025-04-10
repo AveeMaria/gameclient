@@ -31,10 +31,46 @@ Game::~Game()
     SDL_FreeSurface(icon);
 }
 
-void Game::networking(Comms* comms) {
-    UDPpacket* recvPacket = SDLNet_AllocPacket(512);
+void Game::handlePacket(Comms* comms, UDPpacket* recvPacket) {
+    switch ((Uint8)recvPacket->data[0]) {
+    case 0:
+        std::cout << "type: PING\n";
+        break;
+    case 5:
+        std::cout << "type: PONG\n";
+        break;
+        ///////
+    case (int)PacketType::SYN:
+        std::cout << "ERROR: type: SYN\n";//TEGA CLIENT NE SPREJEMA KER POSLJE
+        break;
+    case (int)PacketType::SYN_ACK:
+        std::cout << "type: SYN_ACK\n";
 
-    if (comms->recieve(&recvPacket)) {
+        if (!comms->stack_send(ACK{ SDL_GetTicks() }, recvPacket->address)) {
+            std::cerr << "ERROR: ACK not sent.\n";
+        }
+
+        break;
+    case (int)PacketType::ACK:
+        std::cout << "ERROR: type: ACK\n";//TEGA CLIENT NE SPREJEMA KER POSLJE
+        break;
+    case (int)PacketType::CREATE_TOWER:
+        std::cout << "type: CREATE_TOWER\n";
+
+        CreateTower ct;
+        std::memcpy(&ct, &recvPacket->data[1], sizeof(CreateTower));
+
+        towers.emplace_back(std::make_unique<Tower>(static_cast<TowerType>(ct.type), ct.destRect));
+
+        break;
+    default:
+        std::cout << "Unknown packet type.\n";
+        break;
+    }
+}
+
+void Game::networking(Comms* comms, UDPpacket* recvPacket) {
+    while (comms->recieve(&recvPacket)) {
         if (recvPacket->len == 0) {
             std::cout << "ERROR: EMPTY PACKET";
             //continue;
@@ -47,41 +83,7 @@ void Game::networking(Comms* comms) {
 
         ///PREVER KER PACKET JE PO PRVEM BYTU
 
-        switch ((Uint8)recvPacket->data[0]) {
-        case 0:
-            std::cout << "type: PING\n";
-            break;
-        case 5:
-            std::cout << "type: PONG\n";
-            break;
-            ///////
-        case (int)PacketType::SYN:
-            std::cout << "ERROR: type: SYN\n";//TEGA CLIENT NE SPREJEMA KER POSLJE
-            break;
-        case (int)PacketType::SYN_ACK:
-            std::cout << "type: SYN_ACK\n";
-
-            if (!comms->stack_send(ACK{ SDL_GetTicks() }, recvPacket->address)) {
-                std::cerr << "ERROR: ACK not sent.\n";
-            }
-
-            break;
-        case (int)PacketType::ACK:
-            std::cout << "ERROR: type: ACK\n";//TEGA CLIENT NE SPREJEMA KER POSLJE
-            break;
-        case (int)PacketType::CREATE_TOWER:
-            std::cout << "type: CREATE_TOWER\n";
-            
-            CreateTower ct;
-            std::memcpy(&ct, &recvPacket->data[1], sizeof(CreateTower));  // Copy data into ct
-
-            towers.emplace_back(std::make_unique<Tower>(static_cast<TowerType>(ct.type), ct.destRect));
-
-            break;
-        default:
-            std::cout << "Unknown packet type.\n";
-            break;
-        }
+        handlePacket(comms, recvPacket);
     }
 }
 

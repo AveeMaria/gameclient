@@ -102,7 +102,7 @@ int main(int argc, char* argv[])
 
 		game.handleEvents();
 
-		game.networking(&comms);
+		game.networking(&comms, recvPacket);
 
 		game.update();
 		game.render();
@@ -124,6 +124,8 @@ int main(int argc, char* argv[])
 
 	game.clean();
 	
+	SDLNet_FreePacket(recvPacket);
+
 	if (Renderer::window) {
 		SDL_DestroyWindow(Renderer::window);
 		Renderer::window = nullptr;
