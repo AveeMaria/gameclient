@@ -9,7 +9,6 @@
 #include "./include/config.hpp"
 #include "./include/renderer.hpp"
 
-
 Game game;
 
 int main(int argc, char* argv[])
@@ -51,8 +50,6 @@ int main(int argc, char* argv[])
 		SDL_Quit();
 		return -1;
 	}
-
-
 
 	Renderer::window = SDL_CreateWindow("Vojna kraljestev", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
 
@@ -137,10 +134,8 @@ int main(int argc, char* argv[])
 		Renderer::renderer = nullptr;
 	}
 
-
 	TTF_Quit();
 	SDL_Quit();
-
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(200000));
 

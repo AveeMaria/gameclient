@@ -20,10 +20,6 @@ std::unique_ptr<Cursor> cursor;
 
 Game::Game()
 {
-    
-
-    //comms = Comms("127.0.0.1", (Uint16)123456);
-
     //comms = nullptr;
     //window = NULL;
     mouseX = 0;
@@ -70,7 +66,6 @@ void Game::networking(Comms* comms) {
             }
 
             break;
-
         case (int)PacketType::ACK:
             std::cout << "ERROR: type: ACK\n";//TEGA CLIENT NE SPREJEMA KER POSLJE
             break;

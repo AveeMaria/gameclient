@@ -73,7 +73,7 @@ bool Comms::stack_send(T data) {
 
     sendPacket->data[0] = type;
     std::memcpy(&sendPacket->data[1], &data, sizeof(T));
-    //    printBytes(reinterpret_cast<char*>(sendPacket->data), sizeof(T) + 1);
+    //printBytes(reinterpret_cast<char*>(sendPacket->data), sizeof(T) + 1);
 
     if (sock == nullptr) {
         std::cout << "ERROR: null socket\n";

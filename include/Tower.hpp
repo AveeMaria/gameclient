@@ -31,7 +31,7 @@ private:
 public:
 	Tower();
 	Tower(short r, short c);
-	//Tower(TowerType t, short r, short c);
+	Tower(TowerType t, short r, short c);
 	Tower(TowerType t, SDL_Rect r);
 
 	~Tower();
