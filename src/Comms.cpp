@@ -113,6 +113,27 @@ bool Comms::recieve(UDPpacket** recvPacket)
     return true;
 }
 
+bool Comms::recieve(UDPpacket* recvPacket)
+{
+    if (SDLNet_UDP_Recv(sock, recvPacket) <= 0) {
+        SDLNet_FreePacket(recvPacket);
+        return false;
+    }
+
+    //    size_t size = recvPacket->len;
+    size_t size = (recvPacket)->len;
+
+    //dont delete, samo za debugat
+    //printBytes(reinterpret_cast<char*>((*recvPacket)->data), size);
+
+    std::cout << "Received packet from: " << SDLNet_ResolveIP(&(recvPacket)->address) << "\n";
+
+    std::cout << reinterpret_cast<char*>((recvPacket)->data) << "\n";
+
+    return true;
+}
+
+
 /* IDEJE ZA POZNEJE
 using ReturnType = std::variant<int, float, std::string, Coords>;
 ReturnType myFunction(Uint32 option) {

@@ -33,6 +33,7 @@ public:
     
     bool recieve();
     bool recieve(UDPpacket** recvPacket);
+    bool recieve(UDPpacket* recvPacket);
 };
 
 //////////////////////////

@@ -43,6 +43,12 @@ public:
 	//void networking();
 	//void networking(Comms* comms, UDPpacket* recvPacket);
 
+	void networking(Comms* comms, UDPpacket** recvPacket);
+
+	void networking(Comms* comms, UDPpacket& recvPacket);
+
+	void networking(Comms* comms);
+
 	void init(const char* title, int width, int height, bool fullscreen);
 
 	bool isPaused() const { return paused; }

@@ -20,7 +20,7 @@ file(GLOB_RECURSE SRC_FILES src/*.cpp include/*.hpp)
 #create executable
 add_executable(Game main.cpp ${SRC_FILES} "src/Cursor.cpp" "src/Tower.cpp")
 
-#define SDL_MAIN_HANDLED globally before including SDL headers
+#defined SDL_MAIN_HANDLED globally before including SDL headers
 target_compile_definitions(Game PRIVATE SDL_MAIN_HANDLED)
 
 #link SDL2, SDL2_image, SDL2_net, SDL2_ttf, and SDL2_mixer libraries
