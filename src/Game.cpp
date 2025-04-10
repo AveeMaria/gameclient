@@ -36,18 +36,17 @@ Game::~Game()
 }
 
 void Game::networking(Comms* comms) {
-    if (comms->stack_send(SYN{ SDL_GetTicks() })) {
-        std::cout << "SYN SENT\n";
-    }
+    UDPpacket* recvPacket = SDLNet_AllocPacket(512);
 
-    /*
-    UDPpacket* recvPacket;
     if (comms->recieve(&recvPacket)) {
         if (recvPacket->len == 0) {
             std::cout << "ERROR: EMPTY PACKET";
             //continue;
             return;
         }
+
+        std::cout << "packet len: " << recvPacket->len;
+
         printBytes(reinterpret_cast<char*>(recvPacket->data), recvPacket->len);
 
         ///PREVER KER PACKET JE PO PRVEM BYTU
@@ -76,16 +75,12 @@ void Game::networking(Comms* comms) {
             std::cout << "ERROR: type: ACK\n";//TEGA CLIENT NE SPREJEMA KER POSLJE
             break;
             ///////
-        case 40:
-            std::cout << "type: ENTITY_POS\n";
-            break;
+        
         default:
             std::cout << "Unknown packet type.\n";
             break;
         }
     }
-    */
-    
 }
 
 void Game::init(const char* title, int width, int height, bool fullscreen)
@@ -96,8 +91,6 @@ void Game::init(const char* title, int width, int height, bool fullscreen)
     {
         flags = SDL_WINDOW_FULLSCREEN;
     }
-
-        
     
     isRunning = true;
     

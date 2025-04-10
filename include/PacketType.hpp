@@ -19,27 +19,12 @@ enum class PacketType : Uint8 {
 
     //input data
 
-
     UNDEFINED = 255//smeti?
 };
-
-
-
-//template<typename T>
-//Uint8 checkType(const T& data);
 
 template<typename T>
 Uint8 checkType(const T& data)
 {
-    /*if (std::is_same<T, int>::value) {
-        std::cout << "The type is int.\n";
-        return static_cast<Uint8>(PacketType::INT);
-    }
-    else if (std::is_same<T, float>::value) {
-        std::cout << "The type is float.\n";
-        return static_cast<Uint8>(PacketType::FLOAT);
-    }*/
-
     if (std::is_same<T, Ping>::value) {
         std::cout << "The type is ping.\n";
         return static_cast<Uint8>(PacketType::PING);
@@ -56,7 +41,6 @@ Uint8 checkType(const T& data)
         std::cout << "The type is ack.\n";
         return static_cast<Uint8>(PacketType::ACK);
     }
-
     else if (std::is_same<T, std::string>::value) {
         std::cout << "The type is std::string.\n";
         return static_cast<Uint8>(PacketType::PLAYER_NAME);

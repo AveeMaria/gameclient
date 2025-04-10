@@ -35,10 +35,9 @@ public:
 	~Game();
 
 	void networking(Comms* comms);
-
 	//void networking(Comms& comms);
-
 	//void networking();
+	//void networking(Comms* comms, UDPpacket* recvPacket);
 
 	void init(const char* title, int width, int height, bool fullscreen);
 

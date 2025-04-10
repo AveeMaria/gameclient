@@ -10,9 +10,6 @@
 #include "./include/renderer.hpp"
 
 
-//SDL_Renderer* Renderer::renderer = nullptr;
-//SDL_Window* Renderer::window = nullptr;
-
 Game game;
 
 int main(int argc, char* argv[])
@@ -79,9 +76,6 @@ int main(int argc, char* argv[])
 		//std::this_thread::sleep_for(std::chrono::milliseconds(300));
 	}
 
-
-
-
 	Comms comms("127.0.0.1", (Uint16)12346);
 
 	srand(static_cast<unsigned int>(time(nullptr)));
@@ -94,29 +88,25 @@ int main(int argc, char* argv[])
 	//za racunat FPS
 	int frameCount = 0;
 	Uint32 fpsTimer = SDL_GetTicks();
-	
-	/*
-	if (comms.stack_send(SYN{ 0 })) {
-		std::cout << "SYN SENT\n";
-	}*/
 
 	game.init("Vojna kraljestev", SCREEN_WIDTH, SCREEN_HEIGHT, false);
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(5));
 	
-	for(int i = 0; i<100; i++) {
-		if (comms.stack_send(SYN{ SDL_GetTicks() })) {
-			std::cout << "SYN SENT\n";
-		}
+	if (comms.stack_send(SYN{ SDL_GetTicks() })) {
+		std::cout << "SYN SENT\n";
 	}
 	
-	
+	UDPpacket* recvPacket = SDLNet_AllocPacket(256);
+
 	while (game.running())
 	{
 		frameStart = SDL_GetTicks();
 
 		game.handleEvents();
-		//game.networking(&comms);
+
+		game.networking(&comms);
+
 		game.update();
 		game.render();
 
