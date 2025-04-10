@@ -77,9 +77,10 @@ void Game::networking(Comms* comms) {
         case (int)PacketType::CREATE_TOWER:
             std::cout << "type: CREATE_TOWER\n";
             
-			CreateTower ct;
-			std::memcpy(&ct, &recvPacket->data[1], sizeof(CreateTower));
-            towers.emplace_back(std::make_unique<Tower>(ct.type, ct.destRect));
+            CreateTower ct;
+            std::memcpy(&ct, &recvPacket->data[1], sizeof(CreateTower));  // Copy data into ct
+
+            towers.emplace_back(std::make_unique<Tower>(static_cast<TowerType>(ct.type), ct.destRect));
 
             break;
         default:

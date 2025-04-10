@@ -95,7 +95,7 @@ Tower::Tower(short r, short c)
 	
 	Update();
 }
-
+/*
 Tower::Tower(TowerType t, short r, short c)
 {
 	srcRect = { 0, 0, TEXTURE_SIZE, TEXTURE_SIZE };
@@ -119,7 +119,7 @@ Tower::Tower(TowerType t, short r, short c)
 	}
 
 	Update();
-}
+}*/
 
 Tower::Tower(TowerType t, SDL_Rect r)
 {
