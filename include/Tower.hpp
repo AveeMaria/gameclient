@@ -34,6 +34,10 @@ public:
 	Tower(TowerType t, short r, short c);
 	Tower(TowerType t, SDL_Rect r);
 
+	Tower(int _id, short r, short c);
+	Tower(int _id, TowerType t, short r, short c);
+	Tower(int _id, SDL_Rect r, TowerType t);
+
 	~Tower();
 	
 	bool canShoot(uint32_t);

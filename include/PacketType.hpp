@@ -19,7 +19,8 @@ enum class PacketType : Uint8 {
 
     //gamedata
 
-    CREATE_TOWER = 35,//destrect, type (17byte)
+    CREATE_TOWER = 35,//id, destrect, type
+    CREATE_ENEMY = 40,// id, destrect, type 
 
     PLAYER_NAME = 100,//string
     ENTITY_POS = 140,
@@ -27,7 +28,6 @@ enum class PacketType : Uint8 {
 
     UNDEFINED = 255//smeti?
 };
-
 
 template<typename T>
 Uint8 checkType(const T& data)
@@ -53,6 +53,9 @@ Uint8 checkType(const T& data)
         ////////
         else if (std::is_same<T, CreateTower>::value) {
             return static_cast<Uint8>(PacketType::CREATE_TOWER);
+        }
+        else if (std::is_same<T, CreateEnemy>::value) {
+            return static_cast<Uint8>(PacketType::CREATE_ENEMY);
         }
 
         else if (std::is_same<T, std::string>::value) {

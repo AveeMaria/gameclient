@@ -121,6 +121,29 @@ Enemy::Enemy(Coords& c)
     Update();
 }
 
+Enemy::Enemy(int _id, Coords& c)
+{
+    id = _id;
+    type = static_cast<EnemyType>(std::rand() % 4);
+    objTexture = TextureManager::LoadSharedTexture(typeTexture(type));
+
+    xpos = c.x; ypos = c.y;
+    Update();
+}
+
+Enemy::Enemy(int _id, SDL_Rect r, EnemyType et)
+{
+    destRect = r;
+    xpos = r.x;
+	ypos = r.y;
+
+    id = _id;
+    type = et;
+    objTexture = TextureManager::LoadSharedTexture(typeTexture(type));
+
+    Update();
+}
+
 void Enemy::Update() 
 {
 	srcRect.h = TEXTURE_SIZE;
@@ -139,10 +162,7 @@ void Enemy::Render()
         std::cerr << "ERROR: Enemy objTexture is null.\n";
         return;
     }
-    /*
-    switch (type) {
 
-    }*/
 	SDL_RenderDrawRect(Renderer::renderer, &destRect);
     SDL_RenderCopy(Renderer::renderer, objTexture.get(), &srcRect, &destRect);
 }

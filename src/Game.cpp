@@ -58,9 +58,19 @@ void Game::networking(Comms* comms, UDPpacket* recvPacket)
             break;
         case (int)PacketType::CREATE_TOWER:
             // std::cout << "type: CREATE_TOWER\n";
+
             CreateTower ct;
             std::memcpy(&ct, &recvPacket->data[1], sizeof(CreateTower));
-            towers.emplace_back(std::make_unique<Tower>(static_cast<TowerType>(ct.type), ct.destRect));
+            towers.emplace_back(std::make_unique<Tower>(ct.id, ct.destRect, static_cast<TowerType>(ct.type)));
+            break;
+		case (int)PacketType::CREATE_ENEMY:
+            // std::cout << "type: CREATE_ENEMY\n";
+
+            CreateEnemy ce;
+            std::memcpy(&ce, &recvPacket->data[1], sizeof(CreateEnemy));
+
+            enemies.emplace_back(std::make_unique<Enemy>(ce.id, ce.destRect, static_cast<EnemyType>(ce.type)));
+            
             break;
         default:
             // std::cout << "Unknown packet type.\n";
@@ -146,7 +156,6 @@ void Game::init(const char* title, int width, int height, bool fullscreen)
         SDL_SetWindowIcon(Renderer::window, icon);
     }
     SDL_ShowCursor(SDL_DISABLE);
-
 
     textRenderer = std::make_unique<TextRenderer>();
     textRenderer->loadFont("../../../assets/fonts/MedievalSharp.ttf", 20);

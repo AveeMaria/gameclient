@@ -32,6 +32,8 @@ public:
 
 	Enemy();
 	Enemy(Coords &c);
+	Enemy(int _id, Coords& c);
+	Enemy(int _id, SDL_Rect r, EnemyType et);
 
 	void Update() override;
 	void Render() override;

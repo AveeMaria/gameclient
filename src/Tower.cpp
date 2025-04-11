@@ -140,6 +140,75 @@ Tower::Tower(TowerType t, SDL_Rect r)
 	Update();
 }
 
+Tower::Tower(int _id, short r, short c)
+{
+	id = _id;
+	srcRect = { 0, 0, TEXTURE_SIZE, TEXTURE_SIZE };
+
+	xpos = r * TILESIZE;
+	ypos = c * TILESIZE;
+
+	type = static_cast<TowerType>(rand() % 4);//jaful se casta int v int
+
+	objTexture = TextureManager::LoadSharedTexture(typeTexture(type));
+
+	shootdelay = typeShootDelay(type);
+
+	if (type == TowerType::BARRACKS) {
+		allies.emplace_back(new Ally(100, 500));//TODO FIX KAJ SE KLE DOGAJA????????
+	}
+
+	Update();
+}
+
+Tower::Tower(int _id, TowerType t, short r, short c)
+{
+	id = _id;
+	srcRect = { 0, 0, TEXTURE_SIZE, TEXTURE_SIZE };
+
+	xpos = r * TILESIZE;
+	ypos = c * TILESIZE;
+
+	type = t;
+
+	objTexture = TextureManager::LoadSharedTexture(typeTexture(type));
+
+	shootdelay = typeShootDelay(type);
+
+	if (type == TowerType::BARRACKS) {
+		allies.emplace_back(std::make_unique<Ally>(xpos + TILESIZE / 2, ypos + TILESIZE));
+		allies.emplace_back(std::make_unique<Ally>(xpos + TILESIZE / 2, ypos + TILESIZE * 3 / 2));
+		allies.emplace_back(std::make_unique<Ally>(xpos, ypos + TILESIZE));
+		allies.emplace_back(std::make_unique<Ally>(xpos, ypos + TILESIZE * 3 / 2));
+	}
+
+	Update();
+}
+
+Tower::Tower(int _id, SDL_Rect r, TowerType t)
+{
+	id = _id;
+	srcRect = { 0, 0, TEXTURE_SIZE, TEXTURE_SIZE };
+
+	xpos = r.y;
+	ypos = r.y;
+
+	type = t;
+
+	objTexture = TextureManager::LoadSharedTexture(typeTexture(type));
+
+	shootdelay = typeShootDelay(type);
+
+	if (type == TowerType::BARRACKS) {
+		allies.emplace_back(std::make_unique<Ally>(xpos + TILESIZE / 2, ypos + TILESIZE));
+		allies.emplace_back(std::make_unique<Ally>(xpos + TILESIZE / 2, ypos + TILESIZE * 3 / 2));
+		allies.emplace_back(std::make_unique<Ally>(xpos, ypos + TILESIZE));
+		allies.emplace_back(std::make_unique<Ally>(xpos, ypos + TILESIZE * 3 / 2));
+	}
+
+	Update();
+}
+
 Tower::~Tower()
 {
 }

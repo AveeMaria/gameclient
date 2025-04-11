@@ -33,8 +33,15 @@ struct EntityPos {
 };
 
 struct CreateTower {
+	int id;
 	SDL_Rect destRect;
-	Uint32 type;
+	int type;
+};
+
+struct CreateEnemy {
+	int id;
+	SDL_Rect destRect;
+	int type;
 };
 
 enum class ProjType {
