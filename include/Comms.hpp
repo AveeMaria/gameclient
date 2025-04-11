@@ -109,7 +109,7 @@ bool Comms::stack_send(T data, IPaddress _ip) {
 
     sendPacket->data[0] = type;
     std::memcpy(&sendPacket->data[1], &data, sizeof(T));
-    printBytes(reinterpret_cast<char*>(sendPacket->data), sizeof(T) + 1);
+    //printBytes(reinterpret_cast<char*>(sendPacket->data), sizeof(T) + 1);
 
     if (SDLNet_UDP_Send(sock, -1, sendPacket) < 1) {
         std::cerr << "ERROR: SDLNet_UDP_Send error: " << SDLNet_GetError() << "\n";

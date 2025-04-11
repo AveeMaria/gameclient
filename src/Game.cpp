@@ -77,6 +77,54 @@ void Game::handlePacket(Comms* comms, UDPpacket* recvPacket) {
 
 void Game::networking(Comms* comms, UDPpacket* recvPacket)
 {
+    while (comms->recieve(recvPacket))
+    {
+        auto processStart = std::chrono::high_resolution_clock::now();
+
+        if (recvPacket->len == 0) {
+            std::cout << "ERROR: EMPTY PACKET";
+            return;
+        }
+        // printBytes(reinterpret_cast<char*>(recvPacket->data), recvPacket->len);
+
+        switch ((Uint8)recvPacket->data[0]) {
+        case 0:
+            // std::cout << "type: PING\n";
+            break;
+        case 5:
+            // std::cout << "type: PONG\n";
+            break;
+        case (int)PacketType::SYN:
+            // std::cout << "ERROR: type: SYN\n";
+            break;
+        case (int)PacketType::SYN_ACK:
+            // std::cout << "type: SYN_ACK\n";
+            if (!comms->stack_send(ACK{ SDL_GetTicks() }, recvPacket->address)) {
+                std::cerr << "ERROR: ACK not sent.\n";
+            }
+            break;
+        case (int)PacketType::ACK:
+            // std::cout << "ERROR: type: ACK\n";
+            break;
+        case (int)PacketType::CREATE_TOWER:
+            // std::cout << "type: CREATE_TOWER\n";
+            CreateTower ct;
+            std::memcpy(&ct, &recvPacket->data[1], sizeof(CreateTower));
+            towers.emplace_back(std::make_unique<Tower>(static_cast<TowerType>(ct.type), ct.destRect));
+            break;
+        default:
+            // std::cout << "Unknown packet type.\n";
+            break;
+        }
+        auto processEnd = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double, std::micro> processingTime = processEnd - processStart;
+        std::cout << "Packet processing time: " << processingTime.count() << " microseconds\n";
+    }
+}
+
+/*
+void Game::networking(Comms* comms, UDPpacket* recvPacket)
+{
     while (comms->recieve(recvPacket)) {
         if (recvPacket->len == 0) {
             std::cout << "ERROR: EMPTY PACKET";
@@ -117,6 +165,7 @@ void Game::networking(Comms* comms, UDPpacket* recvPacket)
         }
     }
 }
+*/
 
 void Game::networking(Comms* comms) {
     UDPpacket* recvPacket = SDLNet_AllocPacket(256);
