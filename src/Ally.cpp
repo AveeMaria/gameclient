@@ -7,7 +7,8 @@ Ally::Ally() {
 
 Ally::Ally(const short x, const short y) {
     //objTexture = TextureManager::LoadTexture("../../../assets/ally.png");
-    objTexture = std::make_unique<SDL_Texture*>(TextureManager::LoadTexture("../../../assets/ally.png"));
+    //objTexture = std::make_unique<SDL_Texture*>(TextureManager::LoadTexture("../../../assets/ally.png"));
+    objTexture = TextureManager::LoadSharedTexture("../../../assets/ally.png");
 
     srcRect = { 0, 0, TEXTURE_SIZE, TEXTURE_SIZE };
 
@@ -16,7 +17,9 @@ Ally::Ally(const short x, const short y) {
 }
 
 Ally::Ally(const Coords c) {
-    objTexture = std::make_unique<SDL_Texture*>(TextureManager::LoadTexture("../../../assets/ally.png"));
+    objTexture = TextureManager::LoadSharedTexture("../../../assets/ally.png");
+
+    //objTexture = std::make_unique<SDL_Texture*>(TextureManager::LoadTexture("../../../assets/ally.png"));
     
     //objTexture = TextureManager::LoadTexture("../../../assets/ally.png");
 
@@ -46,5 +49,5 @@ void Ally::Update()
 void Ally::Render()
 {
     //SDL_RenderDrawRect(Renderer::renderer, &destRect);
-    SDL_RenderCopy(Renderer::renderer, *objTexture, &srcRect, &destRect);
+    SDL_RenderCopy(Renderer::renderer, objTexture.get(), &srcRect, &destRect);
 }

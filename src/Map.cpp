@@ -42,13 +42,6 @@ Map::Map() {
 }
 
 Map::~Map() {
-    
-    SDL_DestroyTexture(*water);
-    SDL_DestroyTexture(*sand);
-    SDL_DestroyTexture(*grass);
-    SDL_DestroyTexture(*forest);
-    SDL_DestroyTexture(*corrupted);
-    
 }
 
 short Map::getMapValue(short r, short c)
@@ -80,19 +73,19 @@ void Map::DrawMap() {
             switch (type)
             {
             case 0:
-                TextureManager::Draw(*grass, src, dest);
+                SDL_RenderCopy(Renderer::renderer, *grass, &src, &dest);
                 break;
             case 1:
-                TextureManager::Draw(*sand, src, dest);
+                SDL_RenderCopy(Renderer::renderer, *sand, &src, &dest);
                 break;
             case 2:
-                TextureManager::Draw(*water, src, dest);
+                SDL_RenderCopy(Renderer::renderer, *water, &src, &dest);
                 break;
             case 3:
-                TextureManager::Draw(*forest, src, dest);
+                SDL_RenderCopy(Renderer::renderer, *forest, &src, &dest);
                 break;
             default:
-                TextureManager::Draw(*corrupted, src, dest);
+                SDL_RenderCopy(Renderer::renderer, *corrupted, &src, &dest);
                 break;
             }
         }

@@ -7,28 +7,32 @@
 
 class Entity {
 protected:
+	int id;
+
 	short xpos = 0;
 	short ypos = 0;
-
-	static int ent_cnt;
-
-	std::unique_ptr<SDL_Texture*> objTexture;
+	
+	std::shared_ptr<SDL_Texture> objTexture;
 
 	//SDL_Texture* objTexture = nullptr;
 
 	SDL_Rect srcRect = {0, 0, TILESIZE, TILESIZE };
 	SDL_Rect destRect = {0, 0, TILESIZE, TILESIZE };
 public:
+	static int ent_cnt;
+
 	Entity(const char* texturesheet, short x, short y);
 
 	Entity() {
 		++ent_cnt;
+		id = ent_cnt;
 		//Update();
 	}
 
 	Entity(short x, short y) : xpos(x), ypos(y), objTexture(nullptr), srcRect{ 0, 0, TILESIZE, TILESIZE }, destRect{ 0, 0, TILESIZE, TILESIZE } {
 		++ent_cnt;
-		std::cout << "WARNING: Entity constructor called.\n";
+		id = ent_cnt;
+
 		//Update();
 	}
 
@@ -50,6 +54,8 @@ public:
 
 	Coords getCoords() const;
 	SDL_Rect getRect() const;
+
+	int getID() const { return id; }
 
     void setTilePos(short row, short col) { this->xpos = row * TILESIZE; this->ypos = col * TILESIZE; }
 };

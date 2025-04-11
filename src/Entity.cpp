@@ -2,8 +2,7 @@
 
 Entity::Entity(const char* texturesheet, short x, short y)
 {
-    objTexture = std::make_unique<SDL_Texture*>(TextureManager::LoadTexture(texturesheet));
-    //objTexture = TextureManager::LoadTexture(texturesheet);
+    objTexture = TextureManager::LoadSharedTexture(texturesheet);
     xpos = x;
     ypos = y;
     Update();
@@ -24,7 +23,7 @@ void Entity::Update()
 
 void Entity::Render()
 {
-    SDL_RenderCopy(Renderer::renderer, *objTexture, &srcRect, &destRect);
+    SDL_RenderCopy(Renderer::renderer, objTexture.get(), &srcRect, &destRect);
 }
 
 Entity::Entity(Tile t) : xpos(t.col* TILESIZE), ypos(t.row* TILESIZE), objTexture(nullptr), srcRect{ 0, 0, TILESIZE, TILESIZE }, destRect{ 0, 0, TILESIZE, TILESIZE } {

@@ -14,7 +14,6 @@ enum class EnemyType {
 	KNIGHT//ma armor
 };
 
-
 class Enemy : public Entity {
 private:
 	EnemyType type;
@@ -28,7 +27,6 @@ private:
 
 	//float step = TILESIZE * 0.5f;
 	float step = 1;
-
 public:
 	void Move(std::unique_ptr<Map>& m);
 
@@ -47,18 +45,7 @@ public:
 	void left();
 	void right();
 
-
 	//void print() const { std::cout << "x: " << xpos << " y: " << ypos << "\n"; }
 
 	~Enemy() {}
 };
-
-/*
-//TODO FIX
-SDL_Texture enemyTextures[5] {
-		TextureManager::LoadTexture("../../../assets/goblin.png"),
-		TextureManager::LoadTexture("../../../assets/thief.png"),
-		TextureManager::LoadTexture("../../../assets/bandit.png"),
-		TextureManager::LoadTexture("../../../assets/knight.png"),
-		TextureManager::LoadTexture("../../../assets/enemy.png")
-};*/

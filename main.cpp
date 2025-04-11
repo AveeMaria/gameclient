@@ -11,6 +11,8 @@
 
 Game game;
 
+int Entity::ent_cnt = 0;
+
 int main(int argc, char* argv[])
 {
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER) != 0) {

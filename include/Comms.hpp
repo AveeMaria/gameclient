@@ -69,8 +69,8 @@ bool Comms::stack_send(T data) {
     sendPacket->address.host = ip.host;
     sendPacket->address.port = ip.port;
 
-    std::cout << "size of T: " << sizeof(T) << "\n";
-    std::cout << "Packet len: " << sendPacket->len << "\n";
+    //std::cout << "size of T: " << sizeof(T) << "\n";
+    //std::cout << "Packet len: " << sendPacket->len << "\n";
 
     sendPacket->data[0] = type;
     std::memcpy(&sendPacket->data[1], &data, sizeof(T));

@@ -105,10 +105,8 @@ void Enemy::Move(std::unique_ptr<Map>& m) {
     }
 }
 
-
 Enemy::Enemy() {
-    objTexture = std::make_unique<SDL_Texture*>(TextureManager::LoadTexture("../../../assets/enemy.png"));
-    //objTexture = TextureManager::LoadTexture("../../../assets/enemy.png");
+    objTexture = TextureManager::LoadSharedTexture(typeTexture(type));
     xpos = 0;
     ypos = 0;
     Update();
@@ -116,11 +114,9 @@ Enemy::Enemy() {
 
 Enemy::Enemy(Coords& c)
 {
-    //type = EnemyType::GOBLIN;
     type = static_cast<EnemyType>(std::rand() % 4);
-    objTexture = std::make_unique<SDL_Texture*>(TextureManager::LoadTexture(typeTexture(type)));
+    objTexture = TextureManager::LoadSharedTexture(typeTexture(type));
 
-    //objTexture = TextureManager::LoadTexture(typeTexture(type));
     xpos = c.x; ypos = c.y;
     Update();
 }
@@ -143,11 +139,12 @@ void Enemy::Render()
         std::cerr << "ERROR: Enemy objTexture is null.\n";
         return;
     }
+    /*
     switch (type) {
 
-    }
+    }*/
 	SDL_RenderDrawRect(Renderer::renderer, &destRect);
-	SDL_RenderCopy(Renderer::renderer, *objTexture, &srcRect, &destRect);
+    SDL_RenderCopy(Renderer::renderer, objTexture.get(), &srcRect, &destRect);
 }
 
 //returna true ce je umru da ga deleta

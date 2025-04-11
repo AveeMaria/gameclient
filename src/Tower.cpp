@@ -69,8 +69,7 @@ Tower::Tower()
 	}
 
 	//dobi praviln texture
-	objTexture = std::make_unique<SDL_Texture*>(TextureManager::LoadTexture(typeTexture(type)));
-	//objTexture = TextureManager::LoadTexture(typeTexture(type));
+	objTexture = TextureManager::LoadSharedTexture(typeTexture(type));
 	
 	Update();
 }
@@ -84,8 +83,7 @@ Tower::Tower(short r, short c)
 
 	type = static_cast<TowerType>(rand() % 4);//jaful se casta int v int
 
-	objTexture = std::make_unique<SDL_Texture*>(TextureManager::LoadTexture(typeTexture(type)));
-	//objTexture = TextureManager::LoadTexture(typeTexture(type));
+	objTexture = TextureManager::LoadSharedTexture(typeTexture(type));
 
 	shootdelay = typeShootDelay(type);
 
@@ -105,9 +103,7 @@ Tower::Tower(TowerType t, short r, short c)
 	
 	type = t;
 	
-	objTexture = std::make_unique<SDL_Texture*>(TextureManager::LoadTexture(typeTexture(type)));
-	//objTexture = TextureManager::LoadTexture(typeTexture(type));
-	
+	objTexture = TextureManager::LoadSharedTexture(typeTexture(type));
 	
 	shootdelay = typeShootDelay(type);
 
@@ -130,7 +126,7 @@ Tower::Tower(TowerType t, SDL_Rect r)
 
 	type = t;
 
-	objTexture = std::make_unique<SDL_Texture*>(TextureManager::LoadTexture(typeTexture(type)));
+	objTexture = TextureManager::LoadSharedTexture(typeTexture(type));
 
 	shootdelay = typeShootDelay(type);
 
@@ -146,7 +142,6 @@ Tower::Tower(TowerType t, SDL_Rect r)
 
 Tower::~Tower()
 {
-	SDL_DestroyTexture(*objTexture);
 }
 
 bool Tower::canShoot(uint32_t time)
@@ -258,7 +253,7 @@ void Tower::Update()
 void Tower::Render()
 {
 	Utils::drawColoredCircle(xpos + TILESIZE / 2, ypos + TILESIZE / 2, range, { 0, 0, 0 });
-	SDL_RenderCopy(Renderer::renderer, *objTexture, &srcRect, &destRect);
+	SDL_RenderCopy(Renderer::renderer, objTexture.get(), &srcRect, &destRect);
 	
 	for (auto& p : projectiles) {
 		p->Render();
