@@ -48,6 +48,9 @@ struct DeleteEntity {
 	int id;
 };
 
+struct InitTimer {
+	Uint32 time;
+};
 
 enum class ProjType {
 	ARROW,

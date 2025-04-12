@@ -83,6 +83,11 @@ void Game::networking(Comms* comms, UDPpacket* recvPacket)
 			deletedEntityIDs.emplace_back(_id);
             }
             break;
+        case (int)PacketType::INIT_TIMER:
+            InitTimer tdata;
+			std::memcpy(&tdata, &recvPacket->data[1], sizeof(InitTimer));
+            timer = std::make_unique<Timer>((uint32_t)tdata.time);
+            break;
         default:
             std::cout << "WARNING: Unknown packet type.\n";
             break;
@@ -93,84 +98,7 @@ void Game::networking(Comms* comms, UDPpacket* recvPacket)
         std::cout << "Packet processing time: " << processingTime.count() << " microseconds\n";
     }
 }
-/*
-void Game::networking(Comms* comms) {
-    UDPpacket* recvPacket = SDLNet_AllocPacket(256);
 
-    while (comms->recieve(recvPacket)) {
-        if (recvPacket->len == 0) {
-            std::cout << "ERROR: EMPTY PACKET";
-            //continue;
-            return;
-        }
-
-        std::cout << "packet len: " << recvPacket->len;
-
-        printBytes(reinterpret_cast<char*>(recvPacket->data), recvPacket->len);
-
-        ///PREVER KER PACKET JE PO PRVEM BYTU
-
-        switch ((Uint8)recvPacket->data[0]) {
-        case 0:
-            //std::cout << "type: PING\n";
-            break;
-        case 5:
-            //std::cout << "type: PONG\n";
-            break;
-        case (int)PacketType::SYN:
-            std::cout << "ERROR: type: SYN\n";//TEGA CLIENT NE SPREJEMA KER POSLJE
-            break;
-        case (int)PacketType::SYN_ACK:
-            //std::cout << "type: SYN_ACK\n";
-
-            if (!comms->stack_send(ACK{ SDL_GetTicks() }, recvPacket->address)) {
-                std::cerr << "ERROR: ACK not sent.\n";
-            }
-
-            break;
-        case (int)PacketType::ACK:
-            std::cout << "ERROR: type: ACK\n";//TEGA CLIENT NE SPREJEMA KER POSLJE
-            break;
-        case (int)PacketType::CREATE_TOWER:
-            //std::cout << "type: CREATE_TOWER\n";
-
-            CreateTower ct;
-            std::memcpy(&ct, &recvPacket->data[1], sizeof(CreateTower));
-
-            towers.emplace_back(std::make_unique<Tower>(static_cast<TowerType>(ct.type), ct.destRect));
-            
-            std::cout << "TOWER PRINT:\n}";
-            towers.back()->print();
-        case (int)PacketType::CREATE_ENEMY:
-            // std::cout << "type: CREATE_ENEMY\n";
-
-            CreateEnemy ce;
-            std::memcpy(&ce, &recvPacket->data[1], sizeof(CreateEnemy));
-
-            enemies.emplace_back(std::make_unique<Enemy>(ce.id, ce.destRect, static_cast<EnemyType>(ce.type)));
-
-            break;
-
-        case (int)PacketType::DELETE_ENTITY:
-
-            for (auto it = enemies.begin(); it != enemies.end();) {
-                if (std::find(deletedEntityIDs.begin(), deletedEntityIDs.end(), (*it)->getID()) != deletedEntityIDs.end()) {
-                    deletedEntityIDs.erase(std::find(deletedEntityIDs.begin(), deletedEntityIDs.end(), (*it)->getID()));
-                    it = enemies.erase(it);
-                }
-                else {
-                    ++it;
-                }
-            }
-
-            break;
-        default:
-            std::cout << "Unknown packet type.\n";
-            break;
-        }
-    }
-}
-*/
 void Game::init(const char* title, int width, int height, bool fullscreen)
 {
     int flags = 0;
@@ -197,7 +125,7 @@ void Game::init(const char* title, int width, int height, bool fullscreen)
     textRenderer->loadFont("../../../assets/fonts/MedievalSharp.ttf", 20);
 
     map = std::make_unique<Map>();
-    timer = std::make_unique<Timer>((uint32_t)90);
+    //timer = std::make_unique<Timer>((uint32_t)90);
     cursor = std::make_unique<Cursor>("../../../assets/cursor.png");
 
 	std::cout << "Game initialized\n";
@@ -309,10 +237,7 @@ void Game::handleEvents() {
 void Game::update() {
     cursor->Update();
 
-    if (timer->done()) {
-        //std::cout << "timer finished\n";
-    }
-    else {
+    if (timer) {
         timer->updateTimer();
     }
 
@@ -407,7 +332,11 @@ void Game::render() {
         SDL_Rect r = { 512, 0, 128, 64 };
 
         SDL_RenderDrawRect(Renderer::renderer, &r);
-        textRenderer->renderText(timer->getFancyTime(), r, Color{ 200, 200, 200 });
+
+        if (timer) {
+            textRenderer->renderText(timer->getFancyTime(), r, Color{ 200, 200, 200 });
+        }
+
         if (modal != nullptr) {
             textRenderer->renderText(modal->getTitle(), modal->getTitleRect());
         }

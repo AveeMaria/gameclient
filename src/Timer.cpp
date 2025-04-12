@@ -10,7 +10,8 @@ Timer::Timer()
 Timer::Timer(uint32_t sec)
 {
 	start_time = SDL_GetTicks();
-	seconds = sec * 1000;//kr je v ms
+	//seconds = sec * 1000;//kr je v ms
+	seconds = sec;//server mnozi z 1000 ne client
 	finished = false;
 }
 
