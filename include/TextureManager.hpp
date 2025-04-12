@@ -73,4 +73,11 @@ public:
         std::cerr << "ERROR: Failed to load surface: " << filename << " SDL_image: " << IMG_GetError() << "\n";
         return nullptr;
     }
+
+    static void TextureManager::Draw(SDL_Texture* tex, SDL_Rect src, SDL_Rect dest)
+    {
+        SDL_RenderCopy(Renderer::renderer, tex, &src, &dest);
+    }
+
+
 };

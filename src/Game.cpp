@@ -12,9 +12,11 @@ std::vector<std::unique_ptr<Enemy>> enemies;
 
 std::vector<std::unique_ptr<Tower>> towers;
 
-std::unique_ptr<Modal> modal;
+std::unique_ptr<ShopModal> shop_modal;
 
 std::unique_ptr<Cursor> cursor;
+
+EntityPlace entity_place;
 
 Game::Game()
 {
@@ -31,6 +33,11 @@ Game::~Game()
 
 void Game::networking(Comms* comms, UDPpacket* recvPacket)
 {
+	for (auto& t : towerRequests) {
+        comms->stack_send(t);
+	}
+	towerRequests.clear();
+
     if (comms->recieve(recvPacket))
     {
         auto processStart = std::chrono::high_resolution_clock::now();
@@ -58,40 +65,50 @@ void Game::networking(Comms* comms, UDPpacket* recvPacket)
             break;
         case (int)PacketType::CREATE_TOWER:
             // std::cout << "type: CREATE_TOWER\n";
-
+        {
             CreateTower ct;
             std::memcpy(&ct, &recvPacket->data[1], sizeof(CreateTower));
             towers.emplace_back(std::make_unique<Tower>(ct.id, ct.destRect, static_cast<TowerType>(ct.type)));
-            
+
             std::cout << "TOWER PRINT:\n";
             towers.back()->print();
-
-            break;
-		case (int)PacketType::CREATE_ENEMY:
+        }
+        break;
+        case (int)PacketType::CREATE_ENEMY:
             // std::cout << "type: CREATE_ENEMY\n";
-
+        {
             CreateEnemy ce;
             std::memcpy(&ce, &recvPacket->data[1], sizeof(CreateEnemy));
 
             enemies.emplace_back(std::make_unique<Enemy>(ce.id, ce.destRect, static_cast<EnemyType>(ce.type)));
-
-            break;
+        }
+        break;
         case (int)PacketType::DELETE_ENTITY:
-            {
+        {
             int _id;
             std::memcpy(&_id, &recvPacket->data[1], sizeof(int));
-			deletedEntityIDs.emplace_back(_id);
-            }
-            break;
+            deletedEntityIDs.emplace_back(_id);
+        }
+        break;
         case (int)PacketType::INIT_TIMER:
+        {
             InitTimer tdata;
-			std::memcpy(&tdata, &recvPacket->data[1], sizeof(InitTimer));
+            std::memcpy(&tdata, &recvPacket->data[1], sizeof(InitTimer));
             timer = std::make_unique<Timer>((uint32_t)tdata.time);
-            break;
+        }
+        break;
+        case (int)PacketType::ROLE:
+        {
+            bool r;
+            std::memcpy(&r, &recvPacket->data[1], sizeof(r));
+            defender = r;
+			r ? std::cout << "ROLE: DEFENDER\n" : std::cout << "ROLE: ATTACKER\n";
+        }
+        break;
         default:
             std::cout << "WARNING: Unknown packet type.\n";
             break;
-        }
+        };
 
         auto processEnd = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double, std::micro> processingTime = processEnd - processStart;
@@ -159,22 +176,107 @@ void Game::handleEvents() {
 
                 //ce je double click
                 if (clickTime - lastclick <= DOUBLE_CLICK_DELAY) {
-                    std::cout << "Double click detected\n";
+                    //std::cout << "Double click detected\n";
 
-                    //ce bos 2x kliknu na stolp se odpre modal z specsi/upgradi cene pa shop za postavt towerje
-                    modal = std::make_unique<Modal>("Build new tower?", 5 * TILESIZE, 3 * TILESIZE);
+					//ce bos 2x kliknu na X se zapre shop modal
+                    if (shop_modal != nullptr) {
+
+                        switch (shop_modal->getSelectedOption(mouse_coords))
+                        {
+                        case -1:
+                            shop_modal.reset();
+                            break;
+						case 1:
+							if (defender) {
+								std::cout << "spawn archer\n";
+                                entity_place.setEntity(std::make_unique<SDL_Texture*>(TextureManager::LoadTexture("../../../assets/archer.png")), 1);
+							}
+							else {
+                                std::cout << "spawn goblin\n";
+                                entity_place.setEntity(std::make_unique<SDL_Texture*>(TextureManager::LoadTexture("../../../assets/goblin.png")), 1);
+							}
+                            shop_modal.reset();
+							break;
+                        case 2:
+                            //ce je defender
+                            if (defender) {
+                                std::cout << "spawn mage\n";
+                                entity_place.setEntity(std::make_unique<SDL_Texture*>(TextureManager::LoadTexture("../../../assets/mage.png")), 2);
+                            }
+                            else {
+                                std::cout << "spawn thief\n";
+                                entity_place.setEntity(std::make_unique<SDL_Texture*>(TextureManager::LoadTexture("../../../assets/thief.png")), 2);
+                            }
+                            shop_modal.reset();
+                            break;
+                        case 3:
+                            if (defender) {
+                                std::cout << "spawn barracks\n";
+                                entity_place.setEntity(std::make_unique<SDL_Texture*>(TextureManager::LoadTexture("../../../assets/barracks.png")), 3);
+                            }
+                            else {
+                                std::cout << "spawn bandit\n";
+                                entity_place.setEntity(std::make_unique<SDL_Texture*>(TextureManager::LoadTexture("../../../assets/bandit.png")), 3);
+                            }
+                            shop_modal.reset();
+                            break;
+                        case 4:
+                            if (defender) {
+                                std::cout << "spawn mortar\n";
+                                entity_place.setEntity(std::make_unique<SDL_Texture*>(TextureManager::LoadTexture("../../../assets/mortar.png")), 4);
+                            }
+                            else {
+                                std::cout << "spawn knight\n";
+                                entity_place.setEntity(std::make_unique<SDL_Texture*>(TextureManager::LoadTexture("../../../assets/knight.png")), 4);
+                            }
+                            shop_modal.reset();
+                            break;
+                        default:
+                            break;
+                        }
+                        
+                    }
                 }
+                
                 lastclick = clickTime;               
             }
 
             //za rightclick
             else if (event.button.button == SDL_BUTTON_RIGHT) {
+                
+                if (entity_place.isSet()) {
+                    if (defender) {
+                        std::cout << "defender:\n";
+                        if (map->getMapValue(mouse_coords) == 0) {
+							towerRequests.emplace_back(TowerRequest{ entity_place.getType(), mouse_coords });
+                            entity_place.deleteTex();
+                        }
+                        else {
+                            //NC NAREST NEMORS POSTAVT
+                        }
+                    }
+                    else {
+                        std::cout << "attacker:\n";
+                        if (map->getMapValue(mouse_coords) == 1) {
+                            enemyRequests.emplace_back(EnemyRequest{ entity_place.getType(), mouse_coords });
+                            entity_place.deleteTex();
+                        }
+                        else {
+                            //NC NAREST NEMORS POSTAVT
+                        }
+                    }
+                }
+                else {
+                    std::cout << "entity_place not set";
+                }
+
+                /*
                 for (auto& t : towers) {
                     //ce right clickas na barracke premikas stricke
                     if (t->getType() == TowerType::BARRACKS && Utils::coordInRect(mouse_coords, t->getRect())) {
                         std::cout << "barracks selected\n";
                     }
-                }
+                }*/
             }
             break;
 
@@ -193,8 +295,29 @@ void Game::handleEvents() {
     if (currentKeyStates[SDL_SCANCODE_ESCAPE]) {
         isRunning = false;
     }
-    
-    //neka arhajicna koda za risanje
+
+    if (currentKeyStates[SDL_SCANCODE_L]) {
+        Coords c = Utils::getTileMiddle(Tile{ 1, 0 });
+        c.y -= TILESIZE / 4;
+        enemies.emplace_back(std::make_unique<Enemy>(c));
+    }
+
+    if (currentKeyStates[SDL_SCANCODE_S]) {
+        //spawna shop modal
+		if (defender) {
+			shop_modal = std::make_unique<ShopModal>("Build new tower?", defender, 5, 3);
+		}
+		else {
+			shop_modal = std::make_unique<ShopModal>("Send new troops?", defender, 5, 3);
+		}
+    }
+
+    //izpise entity count
+    if (currentKeyStates[SDL_SCANCODE_K]) {
+        Entity::printEntCnt();
+    }
+
+    /*neka arhajicna koda za risanje
     if (mouse_down && map_editor_mode) {
         map->paintValue(mouseX, mouseY);
     }
@@ -215,23 +338,12 @@ void Game::handleEvents() {
     if (currentKeyStates[SDL_SCANCODE_M]) {
         map->printMap();//to rab bit savemap
     }
-
-    if (currentKeyStates[SDL_SCANCODE_L]) {
-        Coords c = Utils::getTileMiddle(Tile{ 1, 0 });
-        c.y -= TILESIZE / 4;
-        enemies.emplace_back(std::make_unique<Enemy>(c));
-    }
-
-    //izpise ce si u map editor mode
+     //izpise ce si u map editor mode
     if (currentKeyStates[SDL_SCANCODE_P]) {
         map_editor_mode = !map_editor_mode;
         std::cout << "map editor toggled: " << map_editor_mode << "\n";
     }
-
-    //izpise entity count
-    if (currentKeyStates[SDL_SCANCODE_K]) {
-        Entity::printEntCnt();
-    }
+    */
 }
 
 void Game::update() {
@@ -319,11 +431,26 @@ void Game::render() {
         t->Render();
     }
 
-    if (modal != nullptr) {
-        modal->Render();
+    if (shop_modal != nullptr) {
+        shop_modal->Render();
     }
 
     cursor->Render();
+
+
+	if (entity_place.isSet()) {
+        entity_place.setDestRect(mouse_coords.x - TILESIZE * 0.5, mouse_coords.y - TILESIZE * 0.5, TILESIZE, TILESIZE);
+		entity_place.Render();
+	}
+
+	/*
+    if (entity_place != nullptr) {
+        SDL_Rect Dr = { mouseX - TILESIZE * 0.5, mouseY - TILESIZE * 0.5, TILESIZE, TILESIZE };
+        SDL_Rect Sr = { 0, 0, TILESIZE, TILESIZE };
+		SDL_RenderCopy(Renderer::renderer, *entity_place.get(), &Sr, &Dr);
+	}
+    */
+
 
     if (textRenderer == nullptr) {
         std::cout << "ERROR: textRenderer is null.\n";
@@ -331,14 +458,19 @@ void Game::render() {
     else {
         SDL_Rect r = { 512, 0, 128, 64 };
 
-        SDL_RenderDrawRect(Renderer::renderer, &r);
+        //SDL_RenderDrawRect(Renderer::renderer, &r);
 
         if (timer) {
             textRenderer->renderText(timer->getFancyTime(), r, Color{ 200, 200, 200 });
         }
 
-        if (modal != nullptr) {
-            textRenderer->renderText(modal->getTitle(), modal->getTitleRect());
+        if (shop_modal != nullptr) {
+            textRenderer->renderText(shop_modal->getTitle(), shop_modal->getTitleRect());
+			textRenderer->renderText("X", shop_modal->getExitRect(), Color{ 255, 0, 0 });
+			for (int i = 0; i < 4; ++i) {
+                textRenderer->renderText(shop_modal->getDescriptionsA()[i], shop_modal->getDescRectA(i + 1));
+                textRenderer->renderText(shop_modal->getDescriptionsB()[i], shop_modal->getDescRectB(i + 1));
+			}
         }
     }
 

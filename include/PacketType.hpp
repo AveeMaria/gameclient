@@ -17,17 +17,20 @@ enum class PacketType : Uint8 {
     GAME_DATA_START = 25,
     GAME_DATA_END = 30,
 
-	//game data
+    //game data
 
     CREATE_TOWER = 35,//id, destrect, type
     CREATE_ENEMY = 40,// id, destrect, type 
 
     DELETE_ENTITY = 45,//id
 
+    ENEMY_REQUEST = 50,//id, coords
+    TOWER_REQUEST = 55,//id, coords
+
     PLAYER_NAME = 100,//string
+	ROLE = 105,//bool false = attacker, true = defender
     ENTITY_POS = 140,
     //input data
-
 
     INIT_TIMER = 200,//uni32t time
 
@@ -68,11 +71,21 @@ Uint8 checkType(const T& data)
     else if (std::is_same<U, DeleteEntity>::value) {
         return static_cast<Uint8>(PacketType::DELETE_ENTITY);
     }
-
+    ///
+    else if (std::is_same<U, Role>::value) {
+        return static_cast<Uint8>(PacketType::ROLE);
+    }
     else if (std::is_same<U, InitTimer>::value) {
         return static_cast<Uint8>(PacketType::INIT_TIMER);
     }
-
+    ///
+    else if (std::is_same<U, EnemyRequest>::value) {
+        return static_cast<Uint8>(PacketType::ENEMY_REQUEST);
+    }
+    else if (std::is_same<U, TowerRequest>::value) {
+        return static_cast<Uint8>(PacketType::TOWER_REQUEST);
+    }
+    ///
     else if (std::is_same<U, std::string>::value) {
         return static_cast<Uint8>(PacketType::PLAYER_NAME);
     }

@@ -5,9 +5,6 @@
 #include "config.hpp"
 #include "renderer.hpp"
 #include "TextureManager.hpp"
-
-
-
 /////////////////
 
 struct Color {
@@ -25,7 +22,6 @@ struct Coords {
 	int x;
 	int y;
 };
-
 
 struct EntityPos {
 	int id;
@@ -52,6 +48,20 @@ struct InitTimer {
 	Uint32 time;
 };
 
+struct Role {
+	bool defender;//true = defender, false = attacker
+};
+
+struct EnemyRequest {
+	int type;
+	Coords coords;
+};
+
+struct TowerRequest {
+	int type;
+	Coords coords;
+};
+
 enum class ProjType {
 	ARROW,
 	CANNONBALL,
@@ -70,6 +80,15 @@ class Utils {
 public:
 	static void print(const char* msg) {
 		std::cout << msg << "\n";
+	}
+
+	static bool isInsideRect(Coords c, const SDL_Rect& rect) {
+		return (c.x >= rect.x && c.x < (rect.x + rect.w) &&
+			c.y >= rect.y && c.y < (rect.y + rect.h));
+	}
+
+	static Tile getTileFromCoords(const Coords& c) {
+		return Tile{ (short)(c.y / TILESIZE), (short)(c.x / TILESIZE) };
 	}
 
 	static void drawCircle(int &centerX, int &centerY, uint16_t &radius) {

@@ -6,6 +6,7 @@
 
 #include "config.hpp"
 #include "TextureManager.hpp"
+#include "Utils.hpp"
 
 class Map {
 public:
@@ -14,6 +15,8 @@ public:
 
     short getMapValue(short r, short c);
 
+    short getMapValue(Coords c);
+
     void LoadMap(short arr[MAP_ROWS][MAP_COLS]);
     void DrawMap();
 
@@ -21,9 +24,14 @@ public:
     void printMap();
 
 	//TODO KORDS TO ROWS AND COLS
-    
-    short getCol(short x);
-	short getRow(short y);
+
+    short Map::getCol(short x) {
+        return x / TILESIZE;
+    }
+
+    short Map::getRow(short y) {
+        return y / TILESIZE;
+    }
 
     short value = 0;
 private:

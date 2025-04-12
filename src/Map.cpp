@@ -50,6 +50,13 @@ short Map::getMapValue(short r, short c)
     return 0;
 }
 
+short Map::getMapValue(Coords c)
+{
+    short col = getCol(c.x);
+    short row = getRow(c.y);
+    return map[row][col];
+}
+
 void Map::LoadMap(short arr[MAP_ROWS][MAP_COLS]) {
 
     for (short row = 0; row < MAP_ROWS; row++) {
@@ -133,14 +140,4 @@ void Map::printMap()
     std::cout << "}";
 
     std::cout << "\n};\n";*/
-}
-
-short Map::getCol(short x)
-{
-	return x / TILESIZE;
-}
-
-short Map::getRow(short y)
-{
-	return y / TILESIZE;
 }

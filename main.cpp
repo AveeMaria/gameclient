@@ -8,6 +8,7 @@
 #include "./include/Game.hpp"
 #include "./include/config.hpp"
 #include "./include/renderer.hpp"
+#include "include/Mixer.hpp"
 
 Game game;
 
@@ -75,9 +76,12 @@ int main(int argc, char* argv[])
 		//std::this_thread::sleep_for(std::chrono::milliseconds(300));
 	}
 	
+	Mixer mixer("../../../assets/sounds/Battle Preparations.mp3");
+	mixer.playMusic();
+
 	//Comms comms("192.168.0.20", (Uint16)12345);
 	Comms comms("127.0.0.1", 12345);
-
+	
 	srand(static_cast<unsigned int>(time(nullptr)));
 
 	const int frameDelay = 1000 / FPS;

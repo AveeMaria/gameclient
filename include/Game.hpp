@@ -20,13 +20,14 @@
 #include "Map.hpp"
 #include "Utils.hpp"
 #include "Entity.hpp"
-#include "Modal.hpp"
+#include "ShopModal.hpp"
 #include "Cursor.hpp"
 #include "Enemy.hpp"
 #include "Tower.hpp"
 #include "TextRenderer.hpp"
 #include "Timer.hpp"
 #include "Comms.hpp"
+#include "EntityPlace.hpp"
 
 class Game
 {
@@ -58,7 +59,9 @@ private:
 	bool isRunning = false;
 	bool paused = false;
 	bool mouse_down = false;
-	bool map_editor_mode = false;
+	//bool map_editor_mode = false;
+
+	bool defender = true;//true = defender, false = attacker
 
 	SDL_Event event = {};
 	int mouseX = 0, mouseY = 0;
@@ -70,6 +73,9 @@ private:
 	Uint32 lastclick = 0;
 
 	std::vector<int> deletedEntityIDs;
+
+	std::vector<EnemyRequest> enemyRequests;
+	std::vector<TowerRequest> towerRequests;
 
 	uint32_t cnt = 0;
 	//SDL_Window* window = nullptr;

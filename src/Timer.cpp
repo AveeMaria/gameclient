@@ -17,7 +17,7 @@ Timer::Timer(uint32_t sec)
 
 std::string Timer::getFancyTime() const {
 	if (finished) {		
-		return "00:00";
+		return "0:00";
 	}
 
 	uint32_t time = (seconds - (start_time + curr_time)) / 1000;
