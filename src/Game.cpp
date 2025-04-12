@@ -62,6 +62,10 @@ void Game::networking(Comms* comms, UDPpacket* recvPacket)
             CreateTower ct;
             std::memcpy(&ct, &recvPacket->data[1], sizeof(CreateTower));
             towers.emplace_back(std::make_unique<Tower>(ct.id, ct.destRect, static_cast<TowerType>(ct.type)));
+            
+            std::cout << "TOWER PRINT:\n";
+            towers.back()->print();
+
             break;
 		case (int)PacketType::CREATE_ENEMY:
             // std::cout << "type: CREATE_ENEMY\n";
@@ -70,18 +74,26 @@ void Game::networking(Comms* comms, UDPpacket* recvPacket)
             std::memcpy(&ce, &recvPacket->data[1], sizeof(CreateEnemy));
 
             enemies.emplace_back(std::make_unique<Enemy>(ce.id, ce.destRect, static_cast<EnemyType>(ce.type)));
-            
+
+            break;
+        case (int)PacketType::DELETE_ENTITY:
+            {
+            int _id;
+            std::memcpy(&_id, &recvPacket->data[1], sizeof(int));
+			deletedEntityIDs.emplace_back(_id);
+            }
             break;
         default:
-            // std::cout << "Unknown packet type.\n";
+            std::cout << "WARNING: Unknown packet type.\n";
             break;
         }
+
         auto processEnd = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double, std::micro> processingTime = processEnd - processStart;
         std::cout << "Packet processing time: " << processingTime.count() << " microseconds\n";
     }
 }
-
+/*
 void Game::networking(Comms* comms) {
     UDPpacket* recvPacket = SDLNet_AllocPacket(256);
 
@@ -100,16 +112,16 @@ void Game::networking(Comms* comms) {
 
         switch ((Uint8)recvPacket->data[0]) {
         case 0:
-            std::cout << "type: PING\n";
+            //std::cout << "type: PING\n";
             break;
         case 5:
-            std::cout << "type: PONG\n";
+            //std::cout << "type: PONG\n";
             break;
         case (int)PacketType::SYN:
             std::cout << "ERROR: type: SYN\n";//TEGA CLIENT NE SPREJEMA KER POSLJE
             break;
         case (int)PacketType::SYN_ACK:
-            std::cout << "type: SYN_ACK\n";
+            //std::cout << "type: SYN_ACK\n";
 
             if (!comms->stack_send(ACK{ SDL_GetTicks() }, recvPacket->address)) {
                 std::cerr << "ERROR: ACK not sent.\n";
@@ -120,12 +132,36 @@ void Game::networking(Comms* comms) {
             std::cout << "ERROR: type: ACK\n";//TEGA CLIENT NE SPREJEMA KER POSLJE
             break;
         case (int)PacketType::CREATE_TOWER:
-            std::cout << "type: CREATE_TOWER\n";
+            //std::cout << "type: CREATE_TOWER\n";
 
             CreateTower ct;
             std::memcpy(&ct, &recvPacket->data[1], sizeof(CreateTower));
 
             towers.emplace_back(std::make_unique<Tower>(static_cast<TowerType>(ct.type), ct.destRect));
+            
+            std::cout << "TOWER PRINT:\n}";
+            towers.back()->print();
+        case (int)PacketType::CREATE_ENEMY:
+            // std::cout << "type: CREATE_ENEMY\n";
+
+            CreateEnemy ce;
+            std::memcpy(&ce, &recvPacket->data[1], sizeof(CreateEnemy));
+
+            enemies.emplace_back(std::make_unique<Enemy>(ce.id, ce.destRect, static_cast<EnemyType>(ce.type)));
+
+            break;
+
+        case (int)PacketType::DELETE_ENTITY:
+
+            for (auto it = enemies.begin(); it != enemies.end();) {
+                if (std::find(deletedEntityIDs.begin(), deletedEntityIDs.end(), (*it)->getID()) != deletedEntityIDs.end()) {
+                    deletedEntityIDs.erase(std::find(deletedEntityIDs.begin(), deletedEntityIDs.end(), (*it)->getID()));
+                    it = enemies.erase(it);
+                }
+                else {
+                    ++it;
+                }
+            }
 
             break;
         default:
@@ -134,7 +170,7 @@ void Game::networking(Comms* comms) {
         }
     }
 }
-
+*/
 void Game::init(const char* title, int width, int height, bool fullscreen)
 {
     int flags = 0;
@@ -289,9 +325,12 @@ void Game::update() {
             ++it;
 
             std::unique_ptr<Projectile> p = std::make_unique<Projectile>(false);
+            
+            
             if (t->moveProjectiles(p)) {
                 //uzame dmg glede na tower level in na projectile type
-				e->takeDamage(t->calcDmg(p->getType()));
+                // V ONLINE MODE ZAKOMENTIREJ
+                //e->takeDamage(t->calcDmg(p->getType()));
             }
 
             //k je enemy v dosegu
@@ -318,17 +357,23 @@ void Game::update() {
 
     for (auto it = enemies.begin(); it != enemies.end(); ) {
         std::unique_ptr<Enemy>& e = *it;
-        e->Move(map);
-        e->Update();
 
-        if (!e->alive()){
-            it = enemies.erase(it); break;
+        if ((!e->alive()) || ((std::find(deletedEntityIDs.begin(), deletedEntityIDs.end(), e->getID()) != deletedEntityIDs.end()))) {
+            int id = e->getID();
+            it = enemies.erase(it);
+
+            auto pos = std::find(deletedEntityIDs.begin(), deletedEntityIDs.end(), id);
+            if (pos != deletedEntityIDs.end()) {
+                deletedEntityIDs.erase(pos);
+            }
         }
         else {
-			++it;
+            e->Move(map);
+            e->Update();
+            ++it;
         }
     }
-}   
+}
 
 void Game::render() {
 	if (Renderer::renderer == nullptr) {

@@ -105,7 +105,7 @@ void Enemy::Move(std::unique_ptr<Map>& m) {
     }
 }
 
-Enemy::Enemy() {
+Enemy::Enemy() : Entity(0, 0) {
     objTexture = TextureManager::LoadSharedTexture(typeTexture(type));
     xpos = 0;
     ypos = 0;

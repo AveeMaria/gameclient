@@ -190,7 +190,7 @@ Tower::Tower(int _id, SDL_Rect r, TowerType t)
 	id = _id;
 	srcRect = { 0, 0, TEXTURE_SIZE, TEXTURE_SIZE };
 
-	xpos = r.y;
+	xpos = r.x;
 	ypos = r.y;
 
 	type = t;

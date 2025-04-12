@@ -34,18 +34,7 @@ public:
 	Game();
 	~Game();
 
-	void handlePacket(Comms* comms, UDPpacket* recvPacket);
-
 	void networking(Comms* comms, UDPpacket* recvPacket);
-
-	//void networking(Comms* comms);
-	//void networking(Comms& comms);
-	//void networking();
-	//void networking(Comms* comms, UDPpacket* recvPacket);
-
-	void networking(Comms* comms, UDPpacket** recvPacket);
-
-	void networking(Comms* comms, UDPpacket& recvPacket);
 
 	void networking(Comms* comms);
 
@@ -79,6 +68,8 @@ private:
 	const Uint32 debounceDelay = DEBOUNCE_DELAY;
 	Uint32 lastMoveTime = 0;
 	Uint32 lastclick = 0;
+
+	std::vector<int> deletedEntityIDs;
 
 	uint32_t cnt = 0;
 	//SDL_Window* window = nullptr;

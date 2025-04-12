@@ -10,14 +10,25 @@ Comms::Comms()
     std::cout << "----------------------------------\n";
 }
 
-Comms::Comms(const char* h, Uint16 p)
-{
+Comms::Comms(const char* h, Uint16 remotePort) {
     host = h;
-    port = p;
-    resolveHost();
-    openSocket();
-    //allocEmptyPacket(&recvPacket, 256);
-    std::cout << "----------------------------------\n";
+    port = 0;
+
+    if (SDLNet_ResolveHost(&ip, host, remotePort) == -1) {
+        std::cerr << "ERROR: SDLNet_ResolveHost: " << SDLNet_GetError() << "\n";
+    }
+    else {
+        std::cout << "OK: Server " << host << " resolved on port " << remotePort << "\n";
+    }
+    if (!openSocket()) {
+        std::cout << "ERROR CANT OPEN SOCKET\n";
+    }
+
+    std::cout << "Socket: " << sock << "\n";
+    std::cout << "Sending to host: " << ip.host << ", port: " << ip.port << "\n";
+
+
+    std::cout << "Client socket opened on ephemeral port.\n";
 }
 
 Comms::~Comms()
@@ -38,7 +49,7 @@ bool Comms::resolveHost() {
 }
 
 bool Comms::openSocket() {
-    sock = SDLNet_UDP_Open(port);//0 al pa 12345
+    sock = SDLNet_UDP_Open(port);//0 al NEEE(pa 12345)
     if (!sock) {
         std::cerr << "ERROR: SDLNet_UDP_Open: " << SDLNet_GetError() << "\n";
         return false;

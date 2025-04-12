@@ -17,10 +17,12 @@ enum class PacketType : Uint8 {
     GAME_DATA_START = 25,
     GAME_DATA_END = 30,
 
-    //gamedata
+	//game data
 
     CREATE_TOWER = 35,//id, destrect, type
     CREATE_ENEMY = 40,// id, destrect, type 
+
+    DELETE_ENTITY = 45,//id
 
     PLAYER_NAME = 100,//string
     ENTITY_POS = 140,
@@ -56,6 +58,9 @@ Uint8 checkType(const T& data)
         }
         else if (std::is_same<T, CreateEnemy>::value) {
             return static_cast<Uint8>(PacketType::CREATE_ENEMY);
+        }
+        else if (std::is_same<T, DeleteEntity>::value) {
+            return static_cast<Uint8>(PacketType::DELETE_ENTITY);
         }
 
         else if (std::is_same<T, std::string>::value) {

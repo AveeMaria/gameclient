@@ -44,6 +44,11 @@ struct CreateEnemy {
 	int type;
 };
 
+struct DeleteEntity {
+	int id;
+};
+
+
 enum class ProjType {
 	ARROW,
 	CANNONBALL,

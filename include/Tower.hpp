@@ -46,8 +46,8 @@ public:
 
 	void print() { 
 		std::cout << "xpos: " << xpos << " ypos: " << ypos << "\n";
-		std::cout << "destRect: " << destRect.x << " " << destRect.y << "\n";
-		std::cout << "destRect: " << destRect.w << " " << destRect.h << "\n";
+		std::cout << "destRect x,y: " << destRect.x << " " << destRect.y << "\n";
+		std::cout << "destRect w,h: " << destRect.w << " " << destRect.h << "\n";
 	}
 	
 	void deleteProjectiles();
