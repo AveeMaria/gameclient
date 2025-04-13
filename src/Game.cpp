@@ -34,7 +34,7 @@ Game::~Game()
 void Game::networking(Comms* comms, UDPpacket* recvPacket)
 {
     for (auto& t : towerRequests) {
-        comms->stack_send(t,gameID);
+        comms->stack_send(t, gameID);
     }
     towerRequests.clear();
 
@@ -78,18 +78,20 @@ void Game::networking(Comms* comms, UDPpacket* recvPacket)
             // std::cout << "ERROR: type: ACK\n";
             break;
         case (int)PacketType::CREATE_TOWER:
-            // std::cout << "type: CREATE_TOWER\n";
+            std::cout << "recieved type: CREATE_TOWER\n";
         {
             CreateTower ct;
             std::memcpy(&ct, &recvPacket->data[2], sizeof(CreateTower));
+            std::cout << "creating tower type: " << ct.type << "\n";
+            //printBytes(reinterpret_cast<char*>(recvPacket->data), recvPacket->len);
             towers.emplace_back(std::make_unique<Tower>(ct.id, ct.destRect, static_cast<TowerType>(ct.type)));
 
-            std::cout << "TOWER PRINT:\n";
+            //std::cout << "TOWER PRINT:\n";
             towers.back()->print();
         }
         break;
         case (int)PacketType::CREATE_ENEMY:
-            // std::cout << "type: CREATE_ENEMY\n";
+            std::cout << "recieved type: CREATE_ENEMY\n";
         {
             CreateEnemy ce;
             std::memcpy(&ce, &recvPacket->data[2], sizeof(CreateEnemy));
@@ -120,13 +122,14 @@ void Game::networking(Comms* comms, UDPpacket* recvPacket)
         }
         break;
         default:
+            printBytes(reinterpret_cast<char*>(recvPacket->data), recvPacket->len);
             std::cout << "WARNING: Unknown packet type.\n";
             break;
         };
 
         auto processEnd = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double, std::micro> processingTime = processEnd - processStart;
-        std::cout << "Packet processing time: " << processingTime.count() << " microseconds\n";
+        //std::cout << "Packet processing time: " << processingTime.count() << " microseconds\n";
     }
 }
 
@@ -260,9 +263,8 @@ void Game::handleEvents() {
                 
                 if (entity_place.isSet()) {
                     if (defender) {
-                        std::cout << "defender:\n";
                         if (map->getMapValue(mouse_coords) == 0) {
-							towerRequests.emplace_back(TowerRequest{ entity_place.getType(), mouse_coords });
+							towerRequests.emplace_back(TowerRequest{ entity_place.getType() - 1, mouse_coords });
                             entity_place.deleteTex();
                         }
                         else {

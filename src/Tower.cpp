@@ -193,6 +193,8 @@ Tower::Tower(int _id, SDL_Rect r, TowerType t)
 	xpos = r.x;
 	ypos = r.y;
 
+	destRect = r;
+
 	type = t;
 
 	objTexture = TextureManager::LoadSharedTexture(typeTexture(type));

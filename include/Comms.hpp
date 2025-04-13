@@ -103,15 +103,15 @@ template<typename T>
 bool Comms::stack_send(T data, Uint8 _gameID) {
     Uint8 type = checkType(data);
     if (type == 255) return false;
-    if (type == 0) return false;//default game id
+    if (_gameID == 0) return false;//default game id
 
-    UDPpacket* sendPacket = SDLNet_AllocPacket(static_cast<int>(sizeof(T)) + 1);
+    UDPpacket* sendPacket = SDLNet_AllocPacket(static_cast<int>(sizeof(T)) + 2);
     if (sendPacket == nullptr) {
         std::cout << "ERROR: No packet\n";
         return false;
     }
 
-    sendPacket->len = (static_cast<int>(sizeof(T) + 1));
+    sendPacket->len = (static_cast<int>(sizeof(T) + 2));
 
     sendPacket->address.host = ip.host;
     sendPacket->address.port = ip.port;
