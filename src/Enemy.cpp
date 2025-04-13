@@ -137,7 +137,13 @@ Enemy::Enemy(int _id, SDL_Rect r, EnemyType et)
     xpos = r.x;
 	ypos = r.y;
 
+    destRect = r;
+
     id = _id;
+
+    std::cout << "RECIEVE ID: " << _id << "\n";
+    std::cout << "CREATED ENNEMY WITH ID: " << id << "\n";
+
     type = et;
     objTexture = TextureManager::LoadSharedTexture(typeTexture(type));
 

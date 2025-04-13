@@ -54,7 +54,6 @@ struct Role {
 
 struct EnemyRequest {
 	int type;
-	Coords coords;
 };
 
 struct TowerRequest {

@@ -38,6 +38,11 @@ void Game::networking(Comms* comms, UDPpacket* recvPacket)
     }
     towerRequests.clear();
 
+    for (auto& e : enemyRequests) {
+        comms->stack_send(e, gameID);
+    }
+    enemyRequests.clear();
+
     if (comms->recieve(recvPacket))
     {
         //ce je dubu packet z game IDjem ga setta za game id
@@ -78,11 +83,10 @@ void Game::networking(Comms* comms, UDPpacket* recvPacket)
             // std::cout << "ERROR: type: ACK\n";
             break;
         case (int)PacketType::CREATE_TOWER:
-            std::cout << "recieved type: CREATE_TOWER\n";
+            //std::cout << "recieved type: CREATE_TOWER\n";
         {
             CreateTower ct;
             std::memcpy(&ct, &recvPacket->data[2], sizeof(CreateTower));
-            std::cout << "creating tower type: " << ct.type << "\n";
             //printBytes(reinterpret_cast<char*>(recvPacket->data), recvPacket->len);
             towers.emplace_back(std::make_unique<Tower>(ct.id, ct.destRect, static_cast<TowerType>(ct.type)));
 
@@ -90,13 +94,15 @@ void Game::networking(Comms* comms, UDPpacket* recvPacket)
             towers.back()->print();
         }
         break;
-        case (int)PacketType::CREATE_ENEMY:
-            std::cout << "recieved type: CREATE_ENEMY\n";
-        {
-            CreateEnemy ce;
-            std::memcpy(&ce, &recvPacket->data[2], sizeof(CreateEnemy));
+        case (int)PacketType::CREATE_ENEMY:  
+           //std::cout << "received type: CREATE_ENEMY\n";  
+        {  
+           CreateEnemy ce;  
+           std::memcpy(&ce, &recvPacket->data[2], sizeof(CreateEnemy));  
 
-            enemies.emplace_back(std::make_unique<Enemy>(ce.id, ce.destRect, static_cast<EnemyType>(ce.type)));
+           printBytes(reinterpret_cast<char*>(recvPacket->data), recvPacket->len);
+
+           enemies.emplace_back(std::make_unique<Enemy>(ce.id, ce.destRect, static_cast<EnemyType>(ce.type))); 
         }
         break;
         case (int)PacketType::DELETE_ENTITY:
@@ -104,6 +110,8 @@ void Game::networking(Comms* comms, UDPpacket* recvPacket)
             int _id;
             std::memcpy(&_id, &recvPacket->data[2], sizeof(int));
             deletedEntityIDs.emplace_back(_id);
+
+            std::cout << "delete enitiy put on list id: " << deletedEntityIDs.back() << "\n";
         }
         break;
         case (int)PacketType::INIT_TIMER:
@@ -274,7 +282,7 @@ void Game::handleEvents() {
                     else {
                         std::cout << "attacker:\n";
                         if (map->getMapValue(mouse_coords) == 1) {
-                            enemyRequests.emplace_back(EnemyRequest{ entity_place.getType(), mouse_coords });
+                            enemyRequests.emplace_back(EnemyRequest{ entity_place.getType() });
                             entity_place.deleteTex();
                         }
                         else {
@@ -369,6 +377,24 @@ void Game::update() {
         timer->updateTimer();
     }
 
+
+    for (auto it = enemies.begin(); it != enemies.end(); ) {
+        std::unique_ptr<Enemy>& e = *it;
+        if (!e->alive() ||
+            (std::find(deletedEntityIDs.begin(), deletedEntityIDs.end(), e->getID()) != deletedEntityIDs.end()))
+        {
+            std::cout << "deleted enemy";
+
+            it = enemies.erase(it);
+        }
+        else {
+            e->Move(map);
+            e->Update();
+            ++it;
+        }
+    }
+    deletedEntityIDs.clear();
+
     for (auto& t : towers) {
         t->updateAllies();
         
@@ -408,24 +434,6 @@ void Game::update() {
         t->Update();
     }
 
-    for (auto it = enemies.begin(); it != enemies.end(); ) {
-        std::unique_ptr<Enemy>& e = *it;
-
-        if ((!e->alive()) || ((std::find(deletedEntityIDs.begin(), deletedEntityIDs.end(), e->getID()) != deletedEntityIDs.end()))) {
-            int id = e->getID();
-            it = enemies.erase(it);
-
-            auto pos = std::find(deletedEntityIDs.begin(), deletedEntityIDs.end(), id);
-            if (pos != deletedEntityIDs.end()) {
-                deletedEntityIDs.erase(pos);
-            }
-        }
-        else {
-            e->Move(map);
-            e->Update();
-            ++it;
-        }
-    }
 }
 
 void Game::render() {
