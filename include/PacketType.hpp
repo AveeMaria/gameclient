@@ -34,6 +34,7 @@ enum class PacketType : Uint8 {
 
     INIT_TIMER = 200,//uni32t time
 
+    INIT_GAME = 250,//game id Uint8_t
     UNDEFINED = 255//smeti?
 };
 
@@ -92,6 +93,11 @@ Uint8 checkType(const T& data)
     else if (std::is_same<U, EntityPos>::value) {
         return static_cast<Uint8>(PacketType::ENTITY_POS);
     }
+
+    else if (std::is_same<U, InitGame>::value) {
+        return static_cast<Uint8>(PacketType::INIT_GAME);
+    }
+
     else {
         return static_cast<Uint8>(PacketType::UNDEFINED);
     }

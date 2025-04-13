@@ -1,11 +1,11 @@
-#set SDL2, SDL2_image, SDL2_net, SDL2_ttf, and SDL2_mixer directories
+#set library directories
 set(SDL2_DIR "${CMAKE_SOURCE_DIR}/lib/SDL2")
 set(SDL2_IMAGE_DIR "${CMAKE_SOURCE_DIR}/lib/SDL2_image")
 set(SDL2_NET_DIR "${CMAKE_SOURCE_DIR}/lib/SDL2_net")
 set(SDL2_TTF_DIR "${CMAKE_SOURCE_DIR}/lib/SDL2_ttf")
 set(SDL2_MIXER_DIR "${CMAKE_SOURCE_DIR}/lib/SDL2_mixer")
 
-#include SDL2, SDL2_image, SDL2_net, SDL2_ttf, and SDL2_mixer headers
+#include headers
 include_directories(
     "${SDL2_DIR}/include"
     "${SDL2_IMAGE_DIR}/include"
@@ -20,10 +20,9 @@ file(GLOB_RECURSE SRC_FILES src/*.cpp include/*.hpp)
 #create executable
 add_executable(Game main.cpp ${SRC_FILES} "src/Cursor.cpp" "src/Tower.cpp")
 
-#defined SDL_MAIN_HANDLED globally before including SDL headers
 target_compile_definitions(Game PRIVATE SDL_MAIN_HANDLED)
 
-#link SDL2, SDL2_image, SDL2_net, SDL2_ttf, and SDL2_mixer libraries
+#link libraries
 target_link_libraries(Game 
     "${SDL2_DIR}/lib/x64/SDL2.lib"
     "${SDL2_IMAGE_DIR}/lib/x64/SDL2_image.lib"
@@ -32,6 +31,7 @@ target_link_libraries(Game
     "${SDL2_MIXER_DIR}/lib/x64/SDL2_mixer.lib"
 )
 
+#add dll files (windows)
 add_custom_command(TARGET Game POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
     "${SDL2_DIR}/lib/x64/SDL2.dll"
@@ -54,7 +54,7 @@ message(STATUS "SDL2_NET_DIR: ${SDL2_NET_DIR}")
 message(STATUS "SDL2_TTF_DIR: ${SDL2_TTF_DIR}")
 message(STATUS "SDL2_MIXER_DIR: ${SDL2_MIXER_DIR}")
 
-#check if DLL files exist and report errors
+#check if DLL files exist and report errors (windows)
 if(NOT EXISTS "${SDL2_DIR}/lib/x64/SDL2.dll")
     message(FATAL_ERROR "SDL2.dll not found at ${SDL2_DIR}/lib/x64/SDL2.dll")
 endif()

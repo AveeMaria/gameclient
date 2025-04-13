@@ -53,8 +53,10 @@ public:
 
 	const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
 
+	static uint8_t gameCnt;
+	uint8_t getGameID() { return gameID; }
 private:
-	//Comms comms;
+	uint8_t gameID = 0;
 
 	bool isRunning = false;
 	bool paused = false;
@@ -78,5 +80,4 @@ private:
 	std::vector<TowerRequest> towerRequests;
 
 	uint32_t cnt = 0;
-	//SDL_Window* window = nullptr;
 };

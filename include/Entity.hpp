@@ -14,8 +14,6 @@ protected:
 	
 	std::shared_ptr<SDL_Texture> objTexture;
 
-	//SDL_Texture* objTexture = nullptr;
-
 	SDL_Rect srcRect = {0, 0, TILESIZE, TILESIZE };
 	SDL_Rect destRect = {0, 0, TILESIZE, TILESIZE };
 public:

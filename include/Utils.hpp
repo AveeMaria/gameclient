@@ -62,6 +62,10 @@ struct TowerRequest {
 	Coords coords;
 };
 
+struct InitGame {
+	Uint8 gameID;
+};
+
 enum class ProjType {
 	ARROW,
 	CANNONBALL,

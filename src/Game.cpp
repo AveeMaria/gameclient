@@ -33,13 +33,25 @@ Game::~Game()
 
 void Game::networking(Comms* comms, UDPpacket* recvPacket)
 {
-	for (auto& t : towerRequests) {
-        comms->stack_send(t);
-	}
-	towerRequests.clear();
+    for (auto& t : towerRequests) {
+        comms->stack_send(t,gameID);
+    }
+    towerRequests.clear();
 
     if (comms->recieve(recvPacket))
     {
+        //ce je dubu packet z game IDjem ga setta za game id
+        if ((Uint8)recvPacket->data[0] == (int)PacketType::INIT_GAME) {
+            gameID = recvPacket->data[1];
+            std::cout << "Game ID: " << (int)gameID << "\n";
+            return;
+        }
+        /*
+        //ce je dubu normal paketek prever ce je paketek namenjen temu gameIDju
+        if ((Uint8)recvPacket->data[1] != gameID) {
+            return;
+        }*/
+
         auto processStart = std::chrono::high_resolution_clock::now();
 
         // printBytes(reinterpret_cast<char*>(recvPacket->data), recvPacket->len);
@@ -56,6 +68,8 @@ void Game::networking(Comms* comms, UDPpacket* recvPacket)
             break;
         case (int)PacketType::SYN_ACK:
             // std::cout << "type: SYN_ACK\n";
+            
+            //ta ne posle gameidja
             if (!comms->stack_send(ACK{ SDL_GetTicks() }, recvPacket->address)) {
                 std::cerr << "ERROR: ACK not sent.\n";
             }
@@ -67,7 +81,7 @@ void Game::networking(Comms* comms, UDPpacket* recvPacket)
             // std::cout << "type: CREATE_TOWER\n";
         {
             CreateTower ct;
-            std::memcpy(&ct, &recvPacket->data[1], sizeof(CreateTower));
+            std::memcpy(&ct, &recvPacket->data[2], sizeof(CreateTower));
             towers.emplace_back(std::make_unique<Tower>(ct.id, ct.destRect, static_cast<TowerType>(ct.type)));
 
             std::cout << "TOWER PRINT:\n";
@@ -78,7 +92,7 @@ void Game::networking(Comms* comms, UDPpacket* recvPacket)
             // std::cout << "type: CREATE_ENEMY\n";
         {
             CreateEnemy ce;
-            std::memcpy(&ce, &recvPacket->data[1], sizeof(CreateEnemy));
+            std::memcpy(&ce, &recvPacket->data[2], sizeof(CreateEnemy));
 
             enemies.emplace_back(std::make_unique<Enemy>(ce.id, ce.destRect, static_cast<EnemyType>(ce.type)));
         }
@@ -86,23 +100,23 @@ void Game::networking(Comms* comms, UDPpacket* recvPacket)
         case (int)PacketType::DELETE_ENTITY:
         {
             int _id;
-            std::memcpy(&_id, &recvPacket->data[1], sizeof(int));
+            std::memcpy(&_id, &recvPacket->data[2], sizeof(int));
             deletedEntityIDs.emplace_back(_id);
         }
         break;
         case (int)PacketType::INIT_TIMER:
         {
             InitTimer tdata;
-            std::memcpy(&tdata, &recvPacket->data[1], sizeof(InitTimer));
+            std::memcpy(&tdata, &recvPacket->data[2], sizeof(InitTimer));
             timer = std::make_unique<Timer>((uint32_t)tdata.time);
         }
         break;
         case (int)PacketType::ROLE:
         {
             bool r;
-            std::memcpy(&r, &recvPacket->data[1], sizeof(r));
+            std::memcpy(&r, &recvPacket->data[2], sizeof(r));
             defender = r;
-			r ? std::cout << "ROLE: DEFENDER\n" : std::cout << "ROLE: ATTACKER\n";
+            r ? std::cout << "ROLE: DEFENDER\n" : std::cout << "ROLE: ATTACKER\n";
         }
         break;
         default:
@@ -305,7 +319,7 @@ void Game::handleEvents() {
     if (currentKeyStates[SDL_SCANCODE_S]) {
         //spawna shop modal
 		if (defender) {
-			shop_modal = std::make_unique<ShopModal>("Build new tower?", defender, 5, 3);
+			shop_modal = std::make_unique<ShopModal>("Build a new tower?", defender, 5, 3);
 		}
 		else {
 			shop_modal = std::make_unique<ShopModal>("Send new troops?", defender, 5, 3);

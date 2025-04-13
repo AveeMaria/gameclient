@@ -187,6 +187,60 @@ void ShopModal::centerModal() {
 	ypos = (SCREEN_HEIGHT - height) * 0.5;
 }
 
+SDL_Rect ShopModal::getOptionRect(int r) const {
+	switch (r) {
+	case 1:
+		return option1;
+	case 2:
+		return option2;
+	case 3:
+		return option3;
+	case 4:
+		return option4;
+	default:
+		return SDL_Rect{ 0, 0, 0, 0 };
+	}
+}
+
+SDL_Rect ShopModal::getDescRectA(int r) const
+{
+	switch (r) {
+	case 1:
+		return desc1a;
+	case 2:
+		return desc2a;
+	case 3:
+		return desc3a;
+	case 4:
+		return desc4a;
+	default:
+		return SDL_Rect{ 0, 0, 0, 0 };
+	}
+}
+
+SDL_Rect ShopModal::getDescRectB(int r) const {
+	switch (r) {
+	case 1:
+		return desc1b;
+	case 2:
+		return desc2b;
+	case 3:
+		return desc3b;
+	case 4:
+		return desc4b;
+	default:
+		return SDL_Rect{ 0, 0, 0, 0 };
+	}
+}
+
+std::vector<std::string> ShopModal::getDescriptionsA() const {
+	return { descText1a, descText2a, descText3a, descText4a };
+}
+
+std::vector<std::string> ShopModal::getDescriptionsB() const {
+	return { descText1b, descText2b, descText3b, descText4b };
+}
+
 void ShopModal::Render()
 {
 	/*
