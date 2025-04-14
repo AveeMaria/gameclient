@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
 
 	if (Renderer::renderer) {
 		SDL_SetRenderDrawColor(Renderer::renderer, 255, 255, 255, 255);
-		//Utils::drawLoadingScreen();
+		Utils::drawLoadingScreen();
 
 		//simuliramo slow load time
 		//std::this_thread::sleep_for(std::chrono::milliseconds(300));
@@ -99,13 +99,35 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-	game.init("Vojna kraljestev", SCREEN_WIDTH, SCREEN_HEIGHT, false);
-
-	std::this_thread::sleep_for(std::chrono::milliseconds(5));
-	
 	if (comms.stack_send(SYN{ SDL_GetTicks() })) {
 		std::cout << "SYN SENT\n";
 	}
+
+	while (true) {
+		if (comms.recieve(recvPacket)) {
+			if (recvPacket->data[0] == static_cast<Uint8>(PacketType::SYN_ACK)) {
+				std::cout << "SYN_ACK RECEIVED\n";
+
+				if (comms.stack_send(ACK{ SDL_GetTicks() })) {
+					std::cout << "ACK SENT\n---------------------------------------------\n";
+				}
+
+				while (true) {
+					if (comms.recieve(recvPacket)) {
+						if (recvPacket->data[0] == static_cast<Uint8>(PacketType::INIT_GAME)) {
+							game.init("Vojna kraljestev", SCREEN_WIDTH, SCREEN_HEIGHT, recvPacket->data[1]);
+							break;
+						}
+					}
+					std::this_thread::sleep_for(std::chrono::milliseconds(8));
+				}
+
+				break;
+			}
+			std::this_thread::sleep_for(std::chrono::milliseconds(8));
+		}
+	}
+
 
 	while (game.running())
 	{

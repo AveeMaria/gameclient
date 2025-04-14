@@ -170,33 +170,3 @@ bool Comms::stack_send(T data, IPaddress _ip) {
     SDLNet_FreePacket(sendPacket);
     return true;
 }
-
-
-//to je sexy af
-/*
-using ReturnType = std::variant<int, float, std::string, Coords>;
-ReturnType myFunction(Uint32 option);
-*/
-
-/*arhaicno
-template<typename T>
-std::unique_ptr<Uint8[]> prepareData(T data) {
-    size_t packetSize = 1 + sizeof(data);
-    std::cout << "data size: " << packetSize << "\n";
-
-    std::unique_ptr<Uint8[]> buffer(new Uint8[packetSize]);
-    Uint8 type = checkType(data);
-
-    if (type == 255) {
-        return nullptr;
-    }
-    else {
-        buffer[0] = type;
-    }
-
-    std::memcpy(&buffer[1], &data, sizeof(data));
-
-    printBytes(reinterpret_cast<char*>(buffer.get()), packetSize);
-
-    return buffer;
-}*/

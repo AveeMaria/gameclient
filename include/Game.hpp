@@ -37,9 +37,7 @@ public:
 
 	void networking(Comms* comms, UDPpacket* recvPacket);
 
-	void networking(Comms* comms);
-
-	void init(const char* title, int width, int height, bool fullscreen);
+	void init(const char* title, int width, int height, Uint8 gameID);
 
 	bool isPaused() const { return paused; }
 

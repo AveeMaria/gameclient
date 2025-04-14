@@ -39,7 +39,13 @@ void Game::networking(Comms* comms, UDPpacket* recvPacket)
     towerRequests.clear();
 
     for (auto& e : enemyRequests) {
-        comms->stack_send(e, gameID);
+        if (comms->stack_send(e, gameID)) {
+            std::cout << "enemy request sent\n";
+        }
+        else {
+            std::cout << "ERROR: cant send enemy request.\n";
+        }
+        
     }
     enemyRequests.clear();
 
@@ -141,14 +147,15 @@ void Game::networking(Comms* comms, UDPpacket* recvPacket)
     }
 }
 
-void Game::init(const char* title, int width, int height, bool fullscreen)
+void Game::init(const char* title, int width, int height, Uint8 _gameID)
 {
+    gameID = _gameID;
     int flags = 0;
-
+    /*
     if (fullscreen)
     {
         flags = SDL_WINDOW_FULLSCREEN;
-    }
+    }*/
     
     isRunning = true;
     
@@ -280,8 +287,8 @@ void Game::handleEvents() {
                         }
                     }
                     else {
-                        std::cout << "attacker:\n";
                         if (map->getMapValue(mouse_coords) == 1) {
+                            std::cout << "requesting enemy\n";
                             enemyRequests.emplace_back(EnemyRequest{ entity_place.getType() });
                             entity_place.deleteTex();
                         }

@@ -28,7 +28,7 @@ ShopModal::ShopModal(const char* title, bool r, short Tile_width, short Tile_hei
 	objTexture = TextureManager::LoadSharedTexture("../../../assets/modal.png");
 
 	if (r) {
-		std::cout << "OK: defender modal\n";
+		//std::cout << "OK: defender modal\n";
 
 		tex1 = std::make_unique<SDL_Texture*>(TextureManager::LoadTexture("../../../assets/archer.png"));
 		tex2 = std::make_unique<SDL_Texture*>(TextureManager::LoadTexture("../../../assets/mage.png"));
@@ -48,7 +48,7 @@ ShopModal::ShopModal(const char* title, bool r, short Tile_width, short Tile_hei
 		descText4b = "Area 100C";
 	}
 	else {
-		std::cout << "OK: attacker modal\n";
+		//std::cout << "OK: attacker modal\n";
 
 		tex1 = std::make_unique<SDL_Texture*>(TextureManager::LoadTexture("../../../assets/goblin.png"));
 		tex2 = std::make_unique<SDL_Texture*>(TextureManager::LoadTexture("../../../assets/thief.png"));

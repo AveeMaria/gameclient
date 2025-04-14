@@ -5,19 +5,6 @@
 #include <memory>
 #include <map>
 
-/*
-class TextureManager {
-private:
-	//std::unique_ptr<SDL_Texture*> entity;
-public:
-	
-	
-	static SDL_Texture* LoadTexture(const char* filename);
-	static void Draw(SDL_Texture* tex, SDL_Rect src, SDL_Rect dest);
-	static SDL_Surface* LoadSurface(const char* filename);
-};
-*/
-
 class TextureManager {
     static std::map<std::string, std::shared_ptr<SDL_Texture>> textures;
 public:
@@ -38,9 +25,7 @@ public:
             return nullptr;
         }
 
-        auto sharedTex = std::shared_ptr<SDL_Texture>(tex, [](SDL_Texture* t) {
-            SDL_DestroyTexture(t);
-            });
+        auto sharedTex = std::shared_ptr<SDL_Texture>(tex, SDL_DestroyTexture);
 
         textures[filename] = sharedTex;
         return sharedTex;
@@ -78,6 +63,4 @@ public:
     {
         SDL_RenderCopy(Renderer::renderer, tex, &src, &dest);
     }
-
-
 };
