@@ -1,22 +1,6 @@
 #include "../include/Game.hpp"
 
-std::unique_ptr<Timer> timer;
 
-std::unique_ptr<TextRenderer> textRenderer;
-
-std::unique_ptr<Map> map;
-
-Coords mouse_coords = { 0, 0 };
-
-std::vector<std::unique_ptr<Enemy>> enemies;
-
-std::vector<std::unique_ptr<Tower>> towers;
-
-std::unique_ptr<ShopModal> shop_modal;
-
-std::unique_ptr<Cursor> cursor;
-
-EntityPlace entity_place;
 
 Game::Game()
 {

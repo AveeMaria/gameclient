@@ -8,6 +8,7 @@
 
 //tega je loh punim
 enum class EnemyType {
+	UNDEFINED,
 	GOBLIN,//basic ass
 	THIEF,//hitr basic ass
 	BANDIT,//hitr low helth
