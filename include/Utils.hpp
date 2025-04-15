@@ -69,6 +69,10 @@ struct MoneyInit {
 	int money;
 };
 
+struct TerminateGame {
+	bool terminate;
+};
+
 enum class ProjType {
 	ARROW,
 	CANNONBALL,

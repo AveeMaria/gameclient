@@ -170,7 +170,7 @@ int main(int argc, char* argv[])
 	TTF_Quit();
 	SDL_Quit();
 
+	//to je sam za debuggat
 	std::this_thread::sleep_for(std::chrono::milliseconds(200000));
-
 	return 0;
 }

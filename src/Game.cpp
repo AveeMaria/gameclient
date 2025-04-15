@@ -102,11 +102,11 @@ void Game::networking(Comms* comms, UDPpacket* recvPacket)
            
            if (defender) {
                //ce si defender
-               enemyMoney -= Enemy::getPrice(ce.type);
+               enemyMoney -= Enemy::getPrice(ce.type + 1);
            }
            else {
                //attacker si
-               myMoney -= Enemy::getPrice(ce.type);
+               myMoney -= Enemy::getPrice(ce.type + 1);
            }
         }
         break;
@@ -141,6 +141,10 @@ void Game::networking(Comms* comms, UDPpacket* recvPacket)
 
 			std::cout << "MONEY_INIT: " << myMoney << "\n";
         break;
+        case (int)PacketType::TERMINATE:
+			std::cout << "\n\nTERMINATE GAME\n\n";
+			isRunning = false;
+            break;
         default:
             printBytes(reinterpret_cast<char*>(recvPacket->data), recvPacket->len);
             std::cout << "WARNING: Unknown packet type.\n";
