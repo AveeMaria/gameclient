@@ -155,7 +155,7 @@ Tower::Tower(int _id, short r, short c)
 	shootdelay = typeShootDelay(type);
 
 	if (type == TowerType::BARRACKS) {
-		allies.emplace_back(new Ally(100, 500));//TODO FIX KAJ SE KLE DOGAJA????????
+        allies.emplace_back(std::make_unique<Ally>(100, 500));
 	}
 
 	Update();
@@ -262,7 +262,7 @@ bool Tower::moveProjectiles() {
 
 		if (p->moveToTarget(target_coords)) {
 			it = projectiles.erase(it);
-			return true;//zadel prasca
+			return true;//zadel tarco
 		}
 		else {
 			++it;
@@ -333,4 +333,22 @@ void Tower::Render()
 	for (auto& a : allies) {
 		a->Render();
 	}
+}
+
+int Tower::getPrice(int _type) {
+	switch (static_cast<TowerType>(_type)) {
+	case TowerType::ARCHER:
+		return 70;
+		break;
+	case TowerType::MAGE:
+		return 70;
+		break;
+	case TowerType::BARRACKS:
+		return 90;
+		break;
+	case TowerType::MORTAR:
+		return 100;
+		break;
+	}
+	return 0;
 }

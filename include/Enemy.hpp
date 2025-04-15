@@ -26,7 +26,6 @@ private:
 	Direction currDir = Direction::EAST;
 	Direction prevDir = Direction::UNDEFINED;
 
-	//float step = TILESIZE * 0.5f;
 	float step = 1;
 public:
 	void Move(std::unique_ptr<Map>& m);
@@ -48,7 +47,7 @@ public:
 	void left();
 	void right();
 
-	//void print() const { std::cout << "x: " << xpos << " y: " << ypos << "\n"; }
+	static int getPrice(int _type);
 
 	~Enemy() {}
 };

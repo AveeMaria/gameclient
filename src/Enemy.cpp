@@ -169,7 +169,7 @@ void Enemy::Render()
         return;
     }
 
-	SDL_RenderDrawRect(Renderer::renderer, &destRect);
+
     SDL_RenderCopy(Renderer::renderer, objTexture.get(), &srcRect, &destRect);
 }
 
@@ -212,4 +212,22 @@ void Enemy::right()
         return;
     }
     xpos += (short)step;
+}
+
+int Enemy::getPrice(int _type) {
+    switch (static_cast<EnemyType>(_type - 1)) {
+    case EnemyType::GOBLIN:
+        return 10;
+        break;
+    case EnemyType::THIEF:
+        return 20;
+        break;
+    case EnemyType::BANDIT:
+        return 30;
+        break;
+    case EnemyType::KNIGHT:
+        return 50;
+        break;
+    }
+    return 0;
 }

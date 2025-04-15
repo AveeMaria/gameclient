@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TextureManager.hpp">"
+#include "TextureManager.hpp"
 #include <memory>
 
 struct EntityPlace {

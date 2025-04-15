@@ -80,8 +80,14 @@ void Game::networking(Comms* comms, UDPpacket* recvPacket)
             //printBytes(reinterpret_cast<char*>(recvPacket->data), recvPacket->len);
             towers.emplace_back(std::make_unique<Tower>(ct.id, ct.destRect, static_cast<TowerType>(ct.type)));
 
-            //std::cout << "TOWER PRINT:\n";
-            towers.back()->print();
+            if (defender) {
+                //si defender
+                myMoney -= Tower::getPrice(ct.type);
+            }
+            else {
+                //si attacker
+                enemyMoney -= Tower::getPrice(ct.type);
+            }
         }
         break;
         case (int)PacketType::CREATE_ENEMY:  
@@ -92,7 +98,16 @@ void Game::networking(Comms* comms, UDPpacket* recvPacket)
 
            printBytes(reinterpret_cast<char*>(recvPacket->data), recvPacket->len);
 
-           enemies.emplace_back(std::make_unique<Enemy>(ce.id, ce.destRect, static_cast<EnemyType>(ce.type))); 
+           enemies.emplace_back(std::make_unique<Enemy>(ce.id, ce.destRect, static_cast<EnemyType>(ce.type)));
+           
+           if (defender) {
+               //ce si defender
+               enemyMoney -= Enemy::getPrice(ce.type);
+           }
+           else {
+               //attacker si
+               myMoney -= Enemy::getPrice(ce.type);
+           }
         }
         break;
         case (int)PacketType::DELETE_ENTITY:
@@ -118,6 +133,13 @@ void Game::networking(Comms* comms, UDPpacket* recvPacket)
             defender = r;
             r ? std::cout << "ROLE: DEFENDER\n" : std::cout << "ROLE: ATTACKER\n";
         }
+        case (int)PacketType::MONEY_INIT:
+			MoneyInit mdata;
+            std::memcpy(&mdata, &recvPacket->data[2], sizeof(MoneyInit));
+            myMoney = mdata.money;
+            enemyMoney = mdata.money;
+
+			std::cout << "MONEY_INIT: " << myMoney << "\n";
         break;
         default:
             printBytes(reinterpret_cast<char*>(recvPacket->data), recvPacket->len);
@@ -155,7 +177,7 @@ void Game::init(const char* title, int width, int height, Uint8 _gameID)
     SDL_ShowCursor(SDL_DISABLE);
 
     textRenderer = std::make_unique<TextRenderer>();
-    textRenderer->loadFont("../../../assets/fonts/MedievalSharp.ttf", 20);
+    textRenderer->loadFont("../../../assets/fonts/MedievalSharp.ttf", 30);
 
     map = std::make_unique<Map>();
     //timer = std::make_unique<Timer>((uint32_t)90);
@@ -319,11 +341,17 @@ void Game::handleEvents() {
 
     if (currentKeyStates[SDL_SCANCODE_S]) {
         //spawna shop modal
-		if (defender) {
-			shop_modal = std::make_unique<ShopModal>("Build a new tower?", defender, 5, 3);
+        //predn placas nemors odpert shopa
+		if (!entity_place.isSet()) {
+            if (defender) {
+                shop_modal = std::make_unique<ShopModal>("Build a new tower?", defender, 5, 3);
+            }
+            else {
+                shop_modal = std::make_unique<ShopModal>("Send new troops?", defender, 5, 3);
+            }
 		}
 		else {
-			shop_modal = std::make_unique<ShopModal>("Send new troops?", defender, 5, 3);
+			std::cout << "shop modal already open\n";
 		}
     }
 
@@ -452,31 +480,17 @@ void Game::render() {
 
     cursor->Render();
 
-
 	if (entity_place.isSet()) {
         entity_place.setDestRect(mouse_coords.x - TILESIZE * 0.5, mouse_coords.y - TILESIZE * 0.5, TILESIZE, TILESIZE);
 		entity_place.Render();
 	}
 
-	/*
-    if (entity_place != nullptr) {
-        SDL_Rect Dr = { mouseX - TILESIZE * 0.5, mouseY - TILESIZE * 0.5, TILESIZE, TILESIZE };
-        SDL_Rect Sr = { 0, 0, TILESIZE, TILESIZE };
-		SDL_RenderCopy(Renderer::renderer, *entity_place.get(), &Sr, &Dr);
-	}
-    */
-
-
     if (textRenderer == nullptr) {
         std::cout << "ERROR: textRenderer is null.\n";
     }
     else {
-        SDL_Rect r = { 512, 0, 128, 64 };
-
-        //SDL_RenderDrawRect(Renderer::renderer, &r);
-
         if (timer) {
-            textRenderer->renderText(timer->getFancyTime(), r, Color{ 200, 200, 200 });
+            textRenderer->renderText(timer->getFancyTime(), timer->getRect(), Color{200, 200, 200});
         }
 
         if (shop_modal != nullptr) {
@@ -487,6 +501,12 @@ void Game::render() {
                 textRenderer->renderText(shop_modal->getDescriptionsB()[i], shop_modal->getDescRectB(i + 1));
 			}
         }
+
+        SDL_RenderDrawRect(Renderer::renderer, &myMoneyRect);
+        SDL_RenderDrawRect(Renderer::renderer, &enemyMoneyRect);
+
+        textRenderer->renderText(std::to_string(myMoney) + "C", myMoneyRect, Color{ 0, 0, 0 });
+        textRenderer->renderText(std::to_string(enemyMoney) + "C", enemyMoneyRect, Color{0, 0, 0});
     }
 
     SDL_RenderPresent(Renderer::renderer);

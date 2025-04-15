@@ -26,9 +26,6 @@ Comms::Comms(const char* h, Uint16 remotePort) {
 
     std::cout << "Socket: " << sock << "\n";
     std::cout << "Sending to host: " << ip.host << ", port: " << ip.port << "\n";
-
-
-    std::cout << "Client socket opened on ephemeral port.\n";
 }
 
 Comms::~Comms()

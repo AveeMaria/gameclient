@@ -11,4 +11,3 @@ namespace Renderer
 	extern SDL_Renderer* renderer;
 	extern SDL_Window* window;
 }
-	

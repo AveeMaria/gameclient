@@ -75,4 +75,5 @@ public:
 
 	void Update();
 	void Render();
+	static int getPrice(int _type);
 };

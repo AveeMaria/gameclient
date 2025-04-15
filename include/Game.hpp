@@ -59,7 +59,6 @@ private:
 	bool isRunning = false;
 	bool paused = false;
 	bool mouse_down = false;
-	//bool map_editor_mode = false;
 
 	bool defender = true;//true = defender, false = attacker
 
@@ -71,6 +70,10 @@ private:
 	const Uint32 debounceDelay = DEBOUNCE_DELAY;
 	Uint32 lastMoveTime = 0;
 	Uint32 lastclick = 0;
+	
+	SDL_Rect enemyMoneyRect = { 0, 0, TILESIZE, TILESIZE / 2 };
+	SDL_Rect myMoneyRect = { SCREEN_WIDTH - TILESIZE, 0, TILESIZE, TILESIZE / 2 };
+	int myMoney = 0, enemyMoney = 0;
 
 	std::vector<int> deletedEntityIDs;
 

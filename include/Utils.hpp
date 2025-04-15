@@ -65,6 +65,10 @@ struct InitGame {
 	Uint8 gameID;
 };
 
+struct MoneyInit {
+	int money;
+};
+
 enum class ProjType {
 	ARROW,
 	CANNONBALL,
@@ -108,6 +112,7 @@ public:
 			SDL_RenderDrawPoint(Renderer::renderer, centerX - x, centerY - y);//4.kvadrant (-x, -y)
 		}
 	}
+
 
     static void drawColoredCircle(int centerX, int centerY, uint16_t radius, const Color& color) {
         SDL_SetRenderDrawColor(Renderer::renderer, color.red, color.green, color.blue, 255);
