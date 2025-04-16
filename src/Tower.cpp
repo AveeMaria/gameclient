@@ -88,9 +88,12 @@ Tower::Tower(short r, short c)
 	shootdelay = typeShootDelay(type);
 
 	if (type == TowerType::BARRACKS) {
-		allies.emplace_back(new Ally(100, 500));//TODO FIX KAJ SE KLE DOGAJA????????
+		allies.emplace_back(std::make_unique<Ally>(xpos + TILESIZE / 2, ypos + TILESIZE));
+		allies.emplace_back(std::make_unique<Ally>(xpos + TILESIZE / 2, ypos + TILESIZE * 3 / 2));
+		allies.emplace_back(std::make_unique<Ally>(xpos, ypos + TILESIZE));
+		allies.emplace_back(std::make_unique<Ally>(xpos, ypos + TILESIZE * 3 / 2));
 	}
-	
+
 	Update();
 }
 
@@ -106,6 +109,8 @@ Tower::Tower(TowerType t, short r, short c)
 	objTexture = TextureManager::LoadSharedTexture(typeTexture(type));
 	
 	shootdelay = typeShootDelay(type);
+
+	allyRect = { xpos, ypos, xpos + TILESIZE, ypos + TILESIZE };
 
 	if (type == TowerType::BARRACKS) {
 		allies.emplace_back(std::make_unique<Ally>(xpos + TILESIZE / 2, ypos + TILESIZE));
@@ -154,9 +159,6 @@ Tower::Tower(int _id, short r, short c)
 
 	shootdelay = typeShootDelay(type);
 
-	if (type == TowerType::BARRACKS) {
-        allies.emplace_back(std::make_unique<Ally>(100, 500));
-	}
 
 	Update();
 }
@@ -174,8 +176,10 @@ Tower::Tower(int _id, TowerType t, short r, short c)
 	objTexture = TextureManager::LoadSharedTexture(typeTexture(type));
 
 	shootdelay = typeShootDelay(type);
-
+	
 	if (type == TowerType::BARRACKS) {
+		allyRect = { xpos, ypos, xpos + TILESIZE, ypos + TILESIZE };
+		
 		allies.emplace_back(std::make_unique<Ally>(xpos + TILESIZE / 2, ypos + TILESIZE));
 		allies.emplace_back(std::make_unique<Ally>(xpos + TILESIZE / 2, ypos + TILESIZE * 3 / 2));
 		allies.emplace_back(std::make_unique<Ally>(xpos, ypos + TILESIZE));
@@ -200,12 +204,15 @@ Tower::Tower(int _id, SDL_Rect r, TowerType t)
 	objTexture = TextureManager::LoadSharedTexture(typeTexture(type));
 
 	shootdelay = typeShootDelay(type);
+	
 
 	if (type == TowerType::BARRACKS) {
-		allies.emplace_back(std::make_unique<Ally>(xpos + TILESIZE / 2, ypos + TILESIZE));
-		allies.emplace_back(std::make_unique<Ally>(xpos + TILESIZE / 2, ypos + TILESIZE * 3 / 2));
-		allies.emplace_back(std::make_unique<Ally>(xpos, ypos + TILESIZE));
-		allies.emplace_back(std::make_unique<Ally>(xpos, ypos + TILESIZE * 3 / 2));
+		allyRect = { xpos, ypos + TILESIZE, TILESIZE, TILESIZE };
+
+		allies.emplace_back(std::make_unique<Ally>(allyRect.x, allyRect.y));
+		allies.emplace_back(std::make_unique<Ally>(allyRect.x, allyRect.y + TILESIZE / 2));
+		allies.emplace_back(std::make_unique<Ally>(allyRect.x + TILESIZE / 2, allyRect.y));
+		allies.emplace_back(std::make_unique<Ally>(allyRect.x + TILESIZE / 2, allyRect.y + TILESIZE / 2));
 	}
 
 	Update();
@@ -323,7 +330,7 @@ void Tower::Update()
 
 void Tower::Render()
 {
-	Utils::drawColoredCircle(xpos + TILESIZE / 2, ypos + TILESIZE / 2, range, { 0, 0, 0 });
+	//Utils::drawColoredCircle(xpos + TILESIZE / 2, ypos + TILESIZE / 2, range, { 0, 0, 0 });
 	SDL_RenderCopy(Renderer::renderer, objTexture.get(), &srcRect, &destRect);
 	
 	for (auto& p : projectiles) {
@@ -332,6 +339,10 @@ void Tower::Render()
 
 	for (auto& a : allies) {
 		a->Render();
+	}
+
+	if (type == TowerType::BARRACKS) {
+		SDL_RenderDrawRect(Renderer::renderer, &allyRect);
 	}
 }
 

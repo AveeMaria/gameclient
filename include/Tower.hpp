@@ -26,7 +26,7 @@ private:
 
 	uint32_t lastShootTime = 0;
 	uint32_t shootdelay = 500;
-
+	SDL_Rect allyRect = { 0,0,0,0 };
 	Coords target_coords = { 0, 0 };
 public:
 	Tower();
