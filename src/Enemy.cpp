@@ -18,7 +18,7 @@ const char* typeTexture(const EnemyType& t) {
 bool Enemy::Move(std::unique_ptr<Map>& m) {
     //enemy je prsu do zadnga rowa po cesti = je ze v kraljestu
     //enemy dobi score & denar
-    if (xpos >= (MAP_ROWS - 1) * TILESIZE) {
+    if (xpos >= 8 * TILESIZE) {
         return true;
     }
     
@@ -62,8 +62,6 @@ bool Enemy::Move(std::unique_ptr<Map>& m) {
         else {
             currDir = static_cast<Direction>(std::rand() % 4);
         }
-
-        return false;
     }
 
     if (!moved) {
@@ -111,6 +109,8 @@ bool Enemy::Move(std::unique_ptr<Map>& m) {
     if (!moved) {
         currDir = Direction::UNDEFINED;
     }
+
+    return false;
 }
 
 Enemy::Enemy() : Entity(0, 0) {
@@ -164,8 +164,8 @@ void Enemy::Update()
 	srcRect.w = TEXTURE_SIZE;
 	srcRect.x = 0;
 	srcRect.y = 0;
-	destRect.x = xpos;
-	destRect.y = ypos;
+	destRect.x = xpos + TILESIZE / 4;
+	destRect.y = ypos + TILESIZE / 4;
 	destRect.w = TILESIZE / 2;
 	destRect.h = TILESIZE / 2;
 }
@@ -176,7 +176,6 @@ void Enemy::Render()
         std::cerr << "ERROR: Enemy objTexture is null.\n";
         return;
     }
-
 
     SDL_RenderCopy(Renderer::renderer, objTexture.get(), &srcRect, &destRect);
 }
@@ -216,7 +215,7 @@ void Enemy::left()
 }
 void Enemy::right()
 {
-    if (xpos + step > SCREEN_WIDTH - destRect.w) {
+    if (xpos + step > SCREEN_WIDTH + 2 * TILESIZE) {
         return;
     }
     xpos += (short)step;

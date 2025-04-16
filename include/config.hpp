@@ -8,7 +8,7 @@ constexpr int MAP_ROWS = 5;
 
 constexpr int TILESIZE = SCREEN_HEIGHT / MAP_ROWS;
 
-constexpr int FPS = 240;
+constexpr int FPS = 120;
 
 constexpr int DEBOUNCE_DELAY = 80;
 constexpr int DOUBLE_CLICK_DELAY = 170;

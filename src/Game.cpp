@@ -87,24 +87,26 @@ void Game::networking(Comms* comms, UDPpacket* recvPacket)
                 enemyMoney -= Tower::getPrice(ct.type);
             }
         break;
-        case (int)PacketType::CREATE_ENEMY:  
-           CreateEnemy ce;  
-           std::memcpy(&ce, &recvPacket->data[2], sizeof(CreateEnemy));  
+        case (int)PacketType::CREATE_ENEMY:
+            std::cout << "ENEMY CREATED\n";
 
-           printBytes(reinterpret_cast<char*>(recvPacket->data), recvPacket->len);
+            CreateEnemy ce;  
+            std::memcpy(&ce, &recvPacket->data[2], sizeof(CreateEnemy));  
 
-           enemies.emplace_back(std::make_unique<Enemy>(ce.id, ce.destRect, static_cast<EnemyType>(ce.type)));
+            enemies.emplace_back(std::make_unique<Enemy>(ce.id, ce.destRect, static_cast<EnemyType>(ce.type)));
            
-           if (defender) {
-               //ce si defender
-               enemyMoney -= Enemy::getPrice(ce.type + 1);
-           }
-           else {
-               //attacker si
-               myMoney -= Enemy::getPrice(ce.type + 1);
-           }
+            if (defender) {
+                //ce si defender
+                enemyMoney -= Enemy::getPrice(ce.type + 1);
+            }
+            else {
+                //attacker si
+                myMoney -= Enemy::getPrice(ce.type + 1);
+            }
+
         break;
         case (int)PacketType::DELETE_ENTITY:
+            std::cout << "DELETE ENITITY!\n";
         {
             int _id;
             std::memcpy(&_id, &recvPacket->data[2], sizeof(int));
@@ -317,29 +319,29 @@ void Game::handleEvents() {
     const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
 
     if (currentKeyStates[SDL_SCANCODE_ESCAPE]) {
-        isRunning = false;
+        if (shop_modal != nullptr) {
+            shop_modal.reset();
+        }
+        else {
+            isRunning = false;
+        }
     }
 
-    if (currentKeyStates[SDL_SCANCODE_L]) {
-        Coords c = Utils::getTileMiddle(Tile{ 1, 0 });
-        c.y -= TILESIZE / 4;
-        enemies.emplace_back(std::make_unique<Enemy>(c));
-    }
 
     if (currentKeyStates[SDL_SCANCODE_S]) {
         //spawna shop modal
         //predn placas nemors odpert shopa
-		if (!entity_place.isSet()) {
+        if (!entity_place.isSet()) {
             if (defender) {
                 shop_modal = std::make_unique<ShopModal>("Build a new tower?", defender, 5, 3);
             }
             else {
                 shop_modal = std::make_unique<ShopModal>("Send new troops?", defender, 5, 3);
             }
-		}
-		else {
-			std::cout << "shop modal already open\n";
-		}
+        }
+        else {
+            std::cout << "shop modal already open\n";
+        }
     }
 
     //izpise entity count
@@ -386,36 +388,27 @@ void Game::update() {
     for (auto it = enemies.begin(); it != enemies.end(); ) {
         std::unique_ptr<Enemy>& e = *it;
         if (!e->alive() ||
-            (std::find(deletedEntityIDs.begin(), deletedEntityIDs.end(), e->getID()) != deletedEntityIDs.end())) {
-            if (defender) {
-                myMoney += Enemy::getPrice((int)e->getType() + 1) / 2;
-                myScore += Enemy::getPrice((int)e->getType() + 1) * 2;
-            }
-            else {
-                enemyMoney += Enemy::getPrice((int)e->getType() + 1) / 2;
-                enemyScore += Enemy::getPrice((int)e->getType() + 1) * 2;
-            }
-
-            //std::cout << "deleted enemy";
-            it = enemies.erase(it);
-        }
-        //ce je enemy koncau svojo pot vrne true in ga zbrise
-        else if (e->Move(map)) {
-            if (defender) {
-                enemyMoney += Enemy::getPrice((int)e->getType() + 1) / 2;
-                enemyScore += Enemy::getPrice((int)e->getType() + 1) * 2;
-			}
-			else {
-				myMoney += Enemy::getPrice((int)e->getType() + 1) / 2;
-				myScore += Enemy::getPrice((int)e->getType() + 1) * 2;
-			}
-
+            (std::find(deletedEntityIDs.begin(), deletedEntityIDs.end(), e->getID()) != deletedEntityIDs.end()))
+        {
+            std::cout << "deleted enemy";
             it = enemies.erase(it);
         }
         else {
+            if (e->Move(map)) {
+                if (defender) {
+					//si defender
+                    enemyMoney += Enemy::getPrice((int)e->getType()) / 2;
+                    enemyScore += Enemy::getPrice((int)e->getType()) * 2;
+				}
+                else {
+                    //si attacker
+                    myMoney += Enemy::getPrice((int)e->getType()) / 2;
+                    myScore += Enemy::getPrice((int)e->getType()) * 2;
+                }
+            }
             e->Update();
             ++it;
-        }      
+        }
     }
     deletedEntityIDs.clear();
 
