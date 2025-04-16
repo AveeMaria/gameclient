@@ -10,16 +10,43 @@ Comms::Comms()
     std::cout << "----------------------------------\n";
 }
 
-Comms::Comms(const char* h, Uint16 remotePort) {
-    host = h;
+Comms::Comms(Uint16 remotePort) {
     port = 0;
 
-    if (SDLNet_ResolveHost(&ip, host, remotePort) == -1) {
-        std::cerr << "ERROR: SDLNet_ResolveHost: " << SDLNet_GetError() << "\n";
+    std::ifstream file("../../../server_ip.txt");
+
+    std::string line;
+    if (file.is_open()) {
+        if (std::getline(file, line)) {
+            std::cout << "IP from file: " << line.c_str() << "\n";
+            host = line.c_str();
+        }
+        else {
+            std::cerr << "ERROR: Failed to read line from ip.txt\n";
+        }
+        file.close();
     }
     else {
-        std::cout << "OK: Server " << host << " resolved on port " << remotePort << "\n";
+        std::cout << "CANT OPEN FILE ip.txt\n";
     }
+
+    if (line.empty()) {
+        if (SDLNet_ResolveHost(&ip, host, remotePort) == -1) {
+            std::cerr << "ERROR: SDLNet_ResolveHost: " << SDLNet_GetError() << "\n";
+        }
+        else {
+            std::cout << "OK: Server " << host << " resolved on remote port " << remotePort << "\n";
+        }
+    }
+    else {
+        if (SDLNet_ResolveHost(&ip, line.c_str(), remotePort) == -1) {
+            std::cerr << "ERROR: SDLNet_ResolveHost: " << SDLNet_GetError() << "\n";
+        }
+        else {
+            std::cout << "OK: Server " << host << " resolved on remote port " << remotePort << "\n";
+        }
+    }
+
     if (!openSocket()) {
         std::cout << "ERROR CANT OPEN SOCKET\n";
     }

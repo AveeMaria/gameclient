@@ -7,6 +7,8 @@
 #include <bitset>
 #include <iostream>
 #include <sstream>
+#include <fstream>
+#include <string>
 
 class Comms {
 private:
@@ -17,7 +19,7 @@ private:
     Uint16 port;
 public:
     Comms();
-    Comms(const char* h, Uint16 p);
+    Comms(Uint16 p);
     ~Comms();
 
     bool resolveHost();
