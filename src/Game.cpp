@@ -53,9 +53,7 @@ void Game::networking(Comms* comms, UDPpacket* recvPacket)
         switch ((Uint8)recvPacket->data[0]) {
         case 0:
             // std::cout << "type: PING\n";
-            break;
-        case 5:
-            // std::cout << "type: PONG\n";
+            comms->stack_send(PONG{ 0 }, gameID);
             break;
         case (int)PacketType::SYN:
             // std::cout << "ERROR: type: SYN\n";
@@ -113,6 +111,36 @@ void Game::networking(Comms* comms, UDPpacket* recvPacket)
             deletedEntityIDs.emplace_back(_id);
         }
         break;
+        case (int)PacketType::MONEY_SCORE_UPDATE_A:
+            MoneyScoreUpdateA msA;
+            std::memcpy(&msA, &recvPacket->data[2], sizeof(MoneyScoreUpdateA));
+            if (defender) {
+                enemyMoney = msA.money;
+                enemyScore = msA.score;
+            }
+            else {
+                myMoney = msA.money;
+                myScore = msA.score;
+            }
+
+            std::cout << "attacker money: " << msA.money << " score: " << msA.score << "\n";
+
+        break;
+        case (int)PacketType::MONEY_SCORE_UPDATE_D:
+            MoneyScoreUpdateD msD;
+            std::memcpy(&msD, &recvPacket->data[2], sizeof(MoneyScoreUpdateD));
+            if (defender) {
+                myMoney = msD.money;
+                myScore = msD.score;
+            }
+            else {
+                enemyMoney = msD.money;
+                enemyScore = msD.score;
+            }
+
+            std::cout << "Defender money: " << msD.money << " score: " << msD.score << "\n";
+
+            break;
         case (int)PacketType::INIT_TIMER:
         {
             InitTimer tdata;
@@ -135,6 +163,17 @@ void Game::networking(Comms* comms, UDPpacket* recvPacket)
         break;
         case (int)PacketType::TERMINATE:
 			std::cout << "\n\n[WARNING]: TERMINATE GAME\n\n";
+
+            bool aw;
+
+            std::memcpy(&aw, &recvPacket->data[2], sizeof(bool));
+            if (defender && !aw) {
+                std::cout << "-----------\nYOU WON\n-----------\n";
+            }
+            else {
+                std::cout << "-----------\nYOU LOST\n-----------\n";
+            }
+
 			isRunning = false;
             break;
         default:
@@ -343,39 +382,6 @@ void Game::handleEvents() {
             std::cout << "shop modal already open\n";
         }
     }
-
-    //izpise entity count
-    if (currentKeyStates[SDL_SCANCODE_K]) {
-        Entity::printEntCnt();
-    }
-
-    /*neka arhajicna koda za risanje
-    if (mouse_down && map_editor_mode) {
-        map->paintValue(mouseX, mouseY);
-    }
-
-    //MAP EDITING
-    if (currentKeyStates[SDL_SCANCODE_1]) {
-        map->value = 0;
-    }
-    if (currentKeyStates[SDL_SCANCODE_2]) {
-        map->value = 1;
-    }
-    if (currentKeyStates[SDL_SCANCODE_3]) {
-        map->value = 2;
-    }
-    if (currentKeyStates[SDL_SCANCODE_4]) {
-        map->value = 3;
-    }
-    if (currentKeyStates[SDL_SCANCODE_M]) {
-        map->printMap();//to rab bit savemap
-    }
-     //izpise ce si u map editor mode
-    if (currentKeyStates[SDL_SCANCODE_P]) {
-        map_editor_mode = !map_editor_mode;
-        std::cout << "map editor toggled: " << map_editor_mode << "\n";
-    }
-    */
 }
 
 void Game::update() {
@@ -394,18 +400,7 @@ void Game::update() {
             it = enemies.erase(it);
         }
         else {
-            if (e->Move(map)) {
-                if (defender) {
-					//si defender
-                    enemyMoney += Enemy::getPrice((int)e->getType()) / 2;
-                    enemyScore += Enemy::getPrice((int)e->getType()) * 2;
-				}
-                else {
-                    //si attacker
-                    myMoney += Enemy::getPrice((int)e->getType()) / 2;
-                    myScore += Enemy::getPrice((int)e->getType()) * 2;
-                }
-            }
+            e->Move(map);
             e->Update();
             ++it;
         }
@@ -502,13 +497,13 @@ void Game::render() {
 
         if (defender) {
             //ce si defender
-            textRenderer->renderText("attacker (enemy)", enemyNameRect, Color{ 0, 0, 0 });
-            textRenderer->renderText("defender (you)", myNameRect, Color{ 0, 0, 0 });
+            textRenderer->renderText("att. (enemy)", enemyNameRect, Color{ 0, 0, 0 });
+            textRenderer->renderText("def. (you)", myNameRect, Color{ 0, 0, 0 });
         }
         else {
             //ce si attacker
-            textRenderer->renderText("defender (enemy)", enemyNameRect, Color{ 0, 0, 0 });
-            textRenderer->renderText("attacker (you)", myNameRect, Color{ 0, 0, 0 });
+            textRenderer->renderText("def. (enemy)", enemyNameRect, Color{ 0, 0, 0 });
+            textRenderer->renderText("att. (you)", myNameRect, Color{ 0, 0, 0 });
         }
 
         textRenderer->renderText("money : " + std::to_string(myMoney), myMoneyRect, Color{0, 0, 0});
