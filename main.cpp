@@ -17,28 +17,28 @@ int Entity::ent_cnt = 0;
 int main(int argc, char* argv[])
 {
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER) != 0) {
-		std::cerr << "SDL_Init failed: " << SDL_GetError() << std::endl;
+		std::cerr << "[ERROR]: SDL_Init failed: " << SDL_GetError() << std::endl;
 		return -1;
 	}
 
 	{
 	int imgFlags = IMG_INIT_PNG | IMG_INIT_JPG | IMG_INIT_TIF;
 	if ((IMG_Init(imgFlags) & imgFlags) != imgFlags) {
-		std::cerr << "IMG_Init failed: " << IMG_GetError() << std::endl;
+		std::cerr << "[ERROR]: IMG_Init failed: " << IMG_GetError() << std::endl;
 		SDL_Quit();
 		return -1;
 	}
 	}
 
 	if (Mix_Init(MIX_INIT_MP3 | MIX_INIT_OGG) == 0) {
-		std::cerr << "Mix_Init failed: " << Mix_GetError() << std::endl;
+		std::cerr << "[ERROR]: Mix_Init failed: " << Mix_GetError() << std::endl;
 		IMG_Quit();
 		SDL_Quit();
 		return -1;
 	}
 
 	if (TTF_Init() == -1) {
-		std::cerr << "TTF_Init failed: " << TTF_GetError() << std::endl;
+		std::cerr << "[ERROR]: TTF_Init failed: " << TTF_GetError() << std::endl;
 		Mix_Quit();
 		IMG_Quit();
 		SDL_Quit();
@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
 	}
 
 	if (SDLNet_Init() != 0) {
-		std::cerr << "SDLNet_Init failed: " << SDLNet_GetError() << std::endl;
+		std::cerr << "[ERROR]: SDLNet_Init failed: " << SDLNet_GetError() << std::endl;
 		TTF_Quit();
 		Mix_Quit();
 		IMG_Quit();
@@ -57,14 +57,14 @@ int main(int argc, char* argv[])
 	Renderer::window = SDL_CreateWindow("Vojna kraljestev", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
 
 	if (Renderer::window == nullptr) {
-		std::cerr << "Error creating window: " << SDL_GetError() << std::endl;
+		std::cerr << "[ERROR]: creating window: " << SDL_GetError() << std::endl;
 		return -1;
 	}
 
 	Renderer::renderer = SDL_CreateRenderer(Renderer::window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
 	if (Renderer::renderer == nullptr) {
-		std::cerr << "Error creating renderer: " << SDL_GetError() << std::endl;
+		std::cerr << "[ERROR]: creating renderer: " << SDL_GetError() << std::endl;
 		return -1;
 	}
 
@@ -94,21 +94,21 @@ int main(int argc, char* argv[])
 
 	UDPpacket* recvPacket = SDLNet_AllocPacket(256);
 	if (!recvPacket) {
-		std::cerr << "Error allocating packet: " << SDLNet_GetError() << std::endl;
+		std::cerr << "[ERROR]: allocating packet: " << SDLNet_GetError() << std::endl;
 		return -1;
 	}
 
 	if (comms.stack_send(SYN{ SDL_GetTicks() })) {
-		std::cout << "SYN SENT\n";
+		std::cout << "[INFO]: SYN SENT\n";
 	}
 
 	while (true) {
 		if (comms.recieve(recvPacket)) {
 			if (recvPacket->data[0] == static_cast<Uint8>(PacketType::SYN_ACK)) {
-				std::cout << "SYN_ACK RECEIVED\n";
+				std::cout << "[INFO]: SYN_ACK RECEIVED\n";
 
 				if (comms.stack_send(ACK{ SDL_GetTicks() })) {
-					std::cout << "ACK SENT\n---------------------------------------------\n";
+					std::cout << "[INFO]: ACK SENT\n---------------------------------------------\n";
 				}
 
 				while (true) {
@@ -125,7 +125,6 @@ int main(int argc, char* argv[])
 			std::this_thread::sleep_for(std::chrono::milliseconds(8));
 		}
 	}
-
 
 	while (game.running())
 	{
@@ -154,7 +153,7 @@ int main(int argc, char* argv[])
 
 	game.clean();
 
-	//SDLNet_FreePacket(recvPacket);
+	SDLNet_FreePacket(recvPacket);
 
 	if (Renderer::window) {
 		SDL_DestroyWindow(Renderer::window);

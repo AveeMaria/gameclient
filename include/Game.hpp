@@ -70,10 +70,16 @@ private:
 	const Uint32 debounceDelay = DEBOUNCE_DELAY;
 	Uint32 lastMoveTime = 0;
 	Uint32 lastclick = 0;
-	
-	SDL_Rect enemyMoneyRect = { 0, 0, TILESIZE, TILESIZE / 2 };
-	SDL_Rect myMoneyRect = { SCREEN_WIDTH - TILESIZE, 0, TILESIZE, TILESIZE / 2 };
+
+	SDL_Rect enemyNameRect = { 0, 0, TILESIZE, TILESIZE / 4 };
+	SDL_Rect myNameRect = { SCREEN_WIDTH - TILESIZE, 0, TILESIZE, TILESIZE / 4 };
+
+	SDL_Rect enemyMoneyRect = { 0, TILESIZE / 4, TILESIZE, TILESIZE / 4 };
+	SDL_Rect myMoneyRect = { SCREEN_WIDTH - TILESIZE,TILESIZE / 4, TILESIZE, TILESIZE / 4 };
 	int myMoney = 0, enemyMoney = 0;
+
+	SDL_Rect scoreRect = { 4 * TILESIZE, TILESIZE / 2, TILESIZE, TILESIZE / 4 };
+	int myScore = 0, enemyScore = 0;
 
 	std::vector<int> deletedEntityIDs;
 

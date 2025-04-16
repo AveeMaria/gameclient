@@ -9,7 +9,7 @@ private:
 	uint32_t start_time;
 	uint32_t curr_time;
 
-	SDL_Rect rect = { 512, 0, 128, 64 };
+	SDL_Rect rect = { 4 * TILESIZE, 0, TILESIZE, TILESIZE / 2 };
 
 	uint32_t seconds;//kok sekund (auto mnozi z 1000) 
 	bool finished;

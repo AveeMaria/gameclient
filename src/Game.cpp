@@ -24,10 +24,10 @@ void Game::networking(Comms* comms, UDPpacket* recvPacket)
 
     for (auto& e : enemyRequests) {
         if (comms->stack_send(e, gameID)) {
-            std::cout << "enemy request sent\n";
+            //std::cout << "enemy request sent\n";
         }
         else {
-            std::cout << "ERROR: cant send enemy request.\n";
+            std::cout << "[ERROR]: cant send enemy request.\n";
         }
         
     }
@@ -38,18 +38,17 @@ void Game::networking(Comms* comms, UDPpacket* recvPacket)
         //ce je dubu packet z game IDjem ga setta za game id
         if ((Uint8)recvPacket->data[0] == (int)PacketType::INIT_GAME) {
             gameID = recvPacket->data[1];
-            std::cout << "Game ID: " << (int)gameID << "\n";
+            std::cout << "[INFO]:Game ID: " << (int)gameID << "\n";
             return;
         }
-        /*
         //ce je dubu normal paketek prever ce je paketek namenjen temu gameIDju
+        /*
         if ((Uint8)recvPacket->data[1] != gameID) {
             return;
         }*/
+        //printBytes(reinterpret_cast<char*>(recvPacket->data), recvPacket->len);
 
         auto processStart = std::chrono::high_resolution_clock::now();
-
-        // printBytes(reinterpret_cast<char*>(recvPacket->data), recvPacket->len);
 
         switch ((Uint8)recvPacket->data[0]) {
         case 0:
@@ -66,7 +65,7 @@ void Game::networking(Comms* comms, UDPpacket* recvPacket)
             
             //ta ne posle gameidja
             if (!comms->stack_send(ACK{ SDL_GetTicks() }, recvPacket->address)) {
-                std::cerr << "ERROR: ACK not sent.\n";
+                std::cerr << "[ERROR]: ACK not sent.\n";
             }
             break;
         case (int)PacketType::ACK:
@@ -74,10 +73,9 @@ void Game::networking(Comms* comms, UDPpacket* recvPacket)
             break;
         case (int)PacketType::CREATE_TOWER:
             //std::cout << "recieved type: CREATE_TOWER\n";
-        {
+
             CreateTower ct;
             std::memcpy(&ct, &recvPacket->data[2], sizeof(CreateTower));
-            //printBytes(reinterpret_cast<char*>(recvPacket->data), recvPacket->len);
             towers.emplace_back(std::make_unique<Tower>(ct.id, ct.destRect, static_cast<TowerType>(ct.type)));
 
             if (defender) {
@@ -88,11 +86,8 @@ void Game::networking(Comms* comms, UDPpacket* recvPacket)
                 //si attacker
                 enemyMoney -= Tower::getPrice(ct.type);
             }
-        }
         break;
         case (int)PacketType::CREATE_ENEMY:  
-           //std::cout << "received type: CREATE_ENEMY\n";  
-        {  
            CreateEnemy ce;  
            std::memcpy(&ce, &recvPacket->data[2], sizeof(CreateEnemy));  
 
@@ -108,15 +103,12 @@ void Game::networking(Comms* comms, UDPpacket* recvPacket)
                //attacker si
                myMoney -= Enemy::getPrice(ce.type + 1);
            }
-        }
         break;
         case (int)PacketType::DELETE_ENTITY:
         {
             int _id;
             std::memcpy(&_id, &recvPacket->data[2], sizeof(int));
             deletedEntityIDs.emplace_back(_id);
-
-            std::cout << "delete enitiy put on list id: " << deletedEntityIDs.back() << "\n";
         }
         break;
         case (int)PacketType::INIT_TIMER:
@@ -131,23 +123,21 @@ void Game::networking(Comms* comms, UDPpacket* recvPacket)
             bool r;
             std::memcpy(&r, &recvPacket->data[2], sizeof(r));
             defender = r;
-            r ? std::cout << "ROLE: DEFENDER\n" : std::cout << "ROLE: ATTACKER\n";
+            r ? std::cout << "[INFO]: ROLE: DEFENDER\n" : std::cout << "ROLE: ATTACKER\n";
         }
         case (int)PacketType::MONEY_INIT:
 			MoneyInit mdata;
             std::memcpy(&mdata, &recvPacket->data[2], sizeof(MoneyInit));
             myMoney = mdata.money;
             enemyMoney = mdata.money;
-
-			std::cout << "MONEY_INIT: " << myMoney << "\n";
         break;
         case (int)PacketType::TERMINATE:
-			std::cout << "\n\nTERMINATE GAME\n\n";
+			std::cout << "\n\n[WARNING]: TERMINATE GAME\n\n";
 			isRunning = false;
             break;
         default:
             printBytes(reinterpret_cast<char*>(recvPacket->data), recvPacket->len);
-            std::cout << "WARNING: Unknown packet type.\n";
+            std::cout << "[WARNING]: Unknown packet type.\n";
             break;
         };
 
@@ -161,14 +151,8 @@ void Game::init(const char* title, int width, int height, Uint8 _gameID)
 {
     gameID = _gameID;
     int flags = 0;
-    /*
-    if (fullscreen)
-    {
-        flags = SDL_WINDOW_FULLSCREEN;
-    }*/
     
     isRunning = true;
-    
 
     icon = TextureManager::LoadSurface("../../../assets/icon.png");
 
@@ -184,7 +168,6 @@ void Game::init(const char* title, int width, int height, Uint8 _gameID)
     textRenderer->loadFont("../../../assets/fonts/MedievalSharp.ttf", 30);
 
     map = std::make_unique<Map>();
-    //timer = std::make_unique<Timer>((uint32_t)90);
     cursor = std::make_unique<Cursor>("../../../assets/cursor.png");
 
 	std::cout << "Game initialized\n";
@@ -400,21 +383,39 @@ void Game::update() {
         timer->updateTimer();
     }
 
-
     for (auto it = enemies.begin(); it != enemies.end(); ) {
         std::unique_ptr<Enemy>& e = *it;
         if (!e->alive() ||
-            (std::find(deletedEntityIDs.begin(), deletedEntityIDs.end(), e->getID()) != deletedEntityIDs.end()))
-        {
-            std::cout << "deleted enemy";
+            (std::find(deletedEntityIDs.begin(), deletedEntityIDs.end(), e->getID()) != deletedEntityIDs.end())) {
+            if (defender) {
+                myMoney += Enemy::getPrice((int)e->getType() + 1) / 2;
+                myScore += Enemy::getPrice((int)e->getType() + 1) * 2;
+            }
+            else {
+                enemyMoney += Enemy::getPrice((int)e->getType() + 1) / 2;
+                enemyScore += Enemy::getPrice((int)e->getType() + 1) * 2;
+            }
+
+            //std::cout << "deleted enemy";
+            it = enemies.erase(it);
+        }
+        //ce je enemy koncau svojo pot vrne true in ga zbrise
+        else if (e->Move(map)) {
+            if (defender) {
+                enemyMoney += Enemy::getPrice((int)e->getType() + 1) / 2;
+                enemyScore += Enemy::getPrice((int)e->getType() + 1) * 2;
+			}
+			else {
+				myMoney += Enemy::getPrice((int)e->getType() + 1) / 2;
+				myScore += Enemy::getPrice((int)e->getType() + 1) * 2;
+			}
 
             it = enemies.erase(it);
         }
         else {
-            e->Move(map);
             e->Update();
             ++it;
-        }
+        }      
     }
     deletedEntityIDs.clear();
 
@@ -506,11 +507,21 @@ void Game::render() {
 			}
         }
 
-        SDL_RenderDrawRect(Renderer::renderer, &myMoneyRect);
-        SDL_RenderDrawRect(Renderer::renderer, &enemyMoneyRect);
+        if (defender) {
+            //ce si defender
+            textRenderer->renderText("attacker (enemy)", enemyNameRect, Color{ 0, 0, 0 });
+            textRenderer->renderText("defender (you)", myNameRect, Color{ 0, 0, 0 });
+        }
+        else {
+            //ce si attacker
+            textRenderer->renderText("defender (enemy)", enemyNameRect, Color{ 0, 0, 0 });
+            textRenderer->renderText("attacker (you)", myNameRect, Color{ 0, 0, 0 });
+        }
 
-        textRenderer->renderText(std::to_string(myMoney) + "C", myMoneyRect, Color{ 0, 0, 0 });
-        textRenderer->renderText(std::to_string(enemyMoney) + "C", enemyMoneyRect, Color{0, 0, 0});
+        textRenderer->renderText("money : " + std::to_string(myMoney), myMoneyRect, Color{0, 0, 0});
+        textRenderer->renderText("money : " + std::to_string(enemyMoney), enemyMoneyRect, Color{0, 0, 0});
+
+        textRenderer->renderText(std::to_string(enemyScore) + "-" + std::to_string(myScore), scoreRect, Color{ 0, 0, 0 });
     }
 
     SDL_RenderPresent(Renderer::renderer);

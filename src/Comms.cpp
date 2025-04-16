@@ -6,53 +6,55 @@ Comms::Comms()
     port = 12345;
     resolveHost();
     openSocket();
-    //allocPacket(&recvPacket, nullptr, 512);
     std::cout << "----------------------------------\n";
 }
 
 Comms::Comms(Uint16 remotePort) {
     port = 0;
+    host = "127.0.0.1";
 
     std::ifstream file("../../../server_ip.txt");
 
     std::string line;
     if (file.is_open()) {
         if (std::getline(file, line)) {
-            std::cout << "IP from file: " << line.c_str() << "\n";
-            host = line.c_str();
+            std::cout << "[INFO]: ip addr from ip.txt: " << line.c_str() << "\n";
+            if (!line.empty()) {
+                host = line.c_str();
+            }
         }
         else {
-            std::cerr << "ERROR: Failed to read line from ip.txt\n";
+            std::cerr << "[ERROR]: Failed to read line from ip.txt\n";
         }
         file.close();
     }
     else {
-        std::cout << "CANT OPEN FILE ip.txt\n";
+        std::cout << "[ERROR]: cant open file ip.txt\n";
     }
 
-    if (line.empty()) {
+    if (!line.empty()) {
         if (SDLNet_ResolveHost(&ip, host, remotePort) == -1) {
-            std::cerr << "ERROR: SDLNet_ResolveHost: " << SDLNet_GetError() << "\n";
+            std::cerr << "[ERROR]: SDLNet_ResolveHost: " << SDLNet_GetError() << "\n";
         }
         else {
-            std::cout << "OK: Server " << host << " resolved on remote port " << remotePort << "\n";
+            std::cout << "[INFO]: Server " << host << " resolved on remote port " << remotePort << "\n";
         }
     }
     else {
         if (SDLNet_ResolveHost(&ip, line.c_str(), remotePort) == -1) {
-            std::cerr << "ERROR: SDLNet_ResolveHost: " << SDLNet_GetError() << "\n";
+            std::cerr << "[ERROR]: SDLNet_ResolveHost: " << SDLNet_GetError() << "\n";
         }
         else {
-            std::cout << "OK: Server " << host << " resolved on remote port " << remotePort << "\n";
+            std::cout << "[INFO]: Server " << host << " resolved on remote port " << remotePort << "\n";
         }
     }
 
     if (!openSocket()) {
-        std::cout << "ERROR CANT OPEN SOCKET\n";
+        std::cout << "[ERROR]: can't open socket\n";
     }
 
-    std::cout << "Socket: " << sock << "\n";
-    std::cout << "Sending to host: " << ip.host << ", port: " << ip.port << "\n";
+    std::cout << "[INFO]: Socket: " << sock << "\n";
+    std::cout << "[INFO]: Sending to host: " << ip.host << ", port: " << ip.port << "\n";
 }
 
 Comms::~Comms()
@@ -64,27 +66,27 @@ Comms::~Comms()
 
 bool Comms::resolveHost() {
     if (SDLNet_ResolveHost(&ip, host, 12345) == -1) {
-        std::cerr << "ERROR: SDLNet_ResolveHost: " << SDLNet_GetError() << "\n";
+        std::cerr << "[ERROR]: SDLNet_ResolveHost: " << SDLNet_GetError() << "\n";
         return false;
     }
 
-    std::cout << "OK: Host " << host << " resolved.\n";
+    std::cout << "[INFO]: Host " << host << " resolved.\n";
     return true;
 }
 
 bool Comms::openSocket() {
     sock = SDLNet_UDP_Open(port);//0 al NEEE(pa 12345)
     if (!sock) {
-        std::cerr << "ERROR: SDLNet_UDP_Open: " << SDLNet_GetError() << "\n";
+        std::cerr << "[ERROR]: SDLNet_UDP_Open: " << SDLNet_GetError() << "\n";
         return false;
     }
 
     if (sock == nullptr) {
-        std::cerr << "ERROR: Socket null.\n";
+        std::cerr << "[ERROR]: Socket null.\n";
         return false;
     }
 
-    std::cout << "OK: Socket opened on " << port << ".\n";
+    std::cout << "[INFO]: Socket opened on " << port << ".\n";
     return true;
 }
 
@@ -92,7 +94,7 @@ bool Comms::allocEmptyPacket(UDPpacket** packet, int size) const {
     *packet = SDLNet_AllocPacket(size + 256);//udp overhead?
 
     if (!*packet) {
-        std::cerr << "ERROR: SDLNet_AllocPacket: " << SDLNet_GetError() << "\n";
+        std::cerr << "[ERROR]: SDLNet_AllocPacket: " << SDLNet_GetError() << "\n";
         return false;
     }
 
@@ -107,7 +109,7 @@ bool Comms::recieve()
 {
     UDPpacket* recvPacket;
     if (!allocEmptyPacket(&recvPacket, 256)) {
-        std::cerr << "ERROR: Failed to allocate memory for the packet." << std::endl;
+        std::cerr << "[ERROR]: Failed to allocate memory for the packet." << std::endl;
         return false;
     }
 

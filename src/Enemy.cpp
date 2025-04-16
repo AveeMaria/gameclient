@@ -2,20 +2,26 @@
 
 const char* typeTexture(const EnemyType& t) {
     switch (t) {
-        case EnemyType::GOBLIN:
-            return "../../../assets/goblin.png";
-        case EnemyType::THIEF:
-            return "../../../assets/thief.png";
-        case EnemyType::BANDIT:
-            return "../../../assets/bandit.png";
-        case EnemyType::KNIGHT:
-            return "../../../assets/knight.png";
-        default:
-            return "../../../assets/enemy.png";
+    case EnemyType::GOBLIN:
+        return "../../../assets/goblin.png";
+    case EnemyType::THIEF:
+        return "../../../assets/thief.png";
+    case EnemyType::BANDIT:
+        return "../../../assets/bandit.png";
+    case EnemyType::KNIGHT:
+        return "../../../assets/knight.png";
+    default:
+        return "../../../assets/enemy.png";
     }
 }
 
-void Enemy::Move(std::unique_ptr<Map>& m) {
+bool Enemy::Move(std::unique_ptr<Map>& m) {
+    //enemy je prsu do zadnga rowa po cesti = je ze v kraljestu
+    //enemy dobi score & denar
+    if (xpos >= (MAP_ROWS - 1) * TILESIZE) {
+        return true;
+    }
+    
     short row = m->getRow(ypos);
     short col = m->getCol(xpos);
 
@@ -56,6 +62,8 @@ void Enemy::Move(std::unique_ptr<Map>& m) {
         else {
             currDir = static_cast<Direction>(std::rand() % 4);
         }
+
+        return false;
     }
 
     if (!moved) {
@@ -231,3 +239,4 @@ int Enemy::getPrice(int _type) {
     }
     return 0;
 }
+
