@@ -43,7 +43,6 @@ private:
     std::unique_ptr<SDL_Texture*> forest;
     std::unique_ptr<SDL_Texture*> corrupted;
 
-
     /*
     SDL_Texture* water;
     SDL_Texture* sand;
