@@ -246,64 +246,67 @@ void Game::handleEvents() {
 
 					//ce bos 2x kliknu na X se zapre shop modal
                     if (shop_modal != nullptr) {
-
-                        switch (shop_modal->getSelectedOption(mouse_coords))
-                        {
-                        case -1:
-                            shop_modal.reset();
-                            break;
-						case 1:
-							if (defender) {
-								std::cout << "spawn archer\n";
+                        if (defender) {
+                            switch (shop_modal->getSelectedOption(mouse_coords))
+                            {
+                            case -1:
+                                shop_modal.reset();
+                                break;
+                            case 1:
+                                std::cout << "spawn archer\n";
                                 entity_place.setEntity(std::make_unique<SDL_Texture*>(TextureManager::LoadTexture("../../../assets/archer.png")), 1);
-							}
-							else {
-                                std::cout << "spawn goblin\n";
-                                entity_place.setEntity(std::make_unique<SDL_Texture*>(TextureManager::LoadTexture("../../../assets/goblin.png")), 1);
-							}
-                            shop_modal.reset();
-							break;
-                        case 2:
-                            //ce je defender
-                            if (defender) {
+                                shop_modal.reset();
+                                break;
+                            case 2:
                                 std::cout << "spawn mage\n";
                                 entity_place.setEntity(std::make_unique<SDL_Texture*>(TextureManager::LoadTexture("../../../assets/mage.png")), 2);
-                            }
-                            else {
-                                std::cout << "spawn thief\n";
-                                entity_place.setEntity(std::make_unique<SDL_Texture*>(TextureManager::LoadTexture("../../../assets/thief.png")), 2);
-                            }
-                            shop_modal.reset();
-                            break;
-                        case 3:
-                            if (defender) {
+                                shop_modal.reset();
+                                break;
+                            case 3:
                                 std::cout << "spawn barracks\n";
                                 entity_place.setEntity(std::make_unique<SDL_Texture*>(TextureManager::LoadTexture("../../../assets/barracks.png")), 3);
-                            }
-                            else {
-                                std::cout << "spawn bandit\n";
-                                entity_place.setEntity(std::make_unique<SDL_Texture*>(TextureManager::LoadTexture("../../../assets/bandit.png")), 3);
-                            }
-                            shop_modal.reset();
-                            break;
-                        case 4:
-                            if (defender) {
+                                shop_modal.reset();
+                                break;
+                            case 4:
                                 std::cout << "spawn mortar\n";
                                 entity_place.setEntity(std::make_unique<SDL_Texture*>(TextureManager::LoadTexture("../../../assets/mortar.png")), 4);
+                                shop_modal.reset();
+                                break;
+                            default:
+                                break;
                             }
-                            else {
-                                std::cout << "spawn knight\n";
-                                entity_place.setEntity(std::make_unique<SDL_Texture*>(TextureManager::LoadTexture("../../../assets/knight.png")), 4);
-                            }
-                            shop_modal.reset();
-                            break;
-                        default:
-                            break;
                         }
-                        
+                        else {
+                            switch (shop_modal->getSelectedOption(mouse_coords))
+                            {
+                            case -1:
+                                shop_modal.reset();
+                                break;
+                            case 1:
+                                std::cout << "spawn goblin\n";
+                                enemyRequests.emplace_back(EnemyRequest{ 1 });
+                                break;
+                            case 2:
+                                std::cout << "spawn thief\n";
+                                enemyRequests.emplace_back(EnemyRequest{ 2 });
+                                break;
+                            case 3:
+                                std::cout << "spawn bandit\n";
+                                enemyRequests.emplace_back(EnemyRequest{ 3 });
+                                break;
+                            case 4:
+                                std::cout << "spawn knight\n";
+                                enemyRequests.emplace_back(EnemyRequest{ 4 });
+                                break;
+                            default:
+                                break;
+                            }
+
+                        }
                     }
                 }
                 
+
                 lastclick = clickTime;               
             }
 
@@ -320,28 +323,11 @@ void Game::handleEvents() {
                             //NC NAREST NEMORS POSTAVT
                         }
                     }
-                    else {
-                        if (map->getMapValue(mouse_coords) == 1) {
-                            std::cout << "requesting enemy\n";
-                            enemyRequests.emplace_back(EnemyRequest{ entity_place.getType() });
-                            entity_place.deleteTex();
-                        }
-                        else {
-                            //NC NAREST NEMORS POSTAVT
-                        }
-                    }
                 }
                 else {
                     std::cout << "entity_place not set";
                 }
 
-                /*
-                for (auto& t : towers) {
-                    //ce right clickas na barracke premikas stricke
-                    if (t->getType() == TowerType::BARRACKS && Utils::coordInRect(mouse_coords, t->getRect())) {
-                        std::cout << "barracks selected\n";
-                    }
-                }*/
             }
             break;
 
